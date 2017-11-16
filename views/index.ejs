@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Accueil</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+	  <% if (!locals.login) { %>
+	<div class="div_enter_data">
+		<% if (locals.message) { %>
+			<p><%= locals.message %></p>
+		<% } if (locals.error) { %>
+			<p><%= locals.error %></p>
+		<% } %>
+		<div id="title_div_su">
+			<h2>Sign up</h2>
+		</div>
+		<div id="form_div_su">
+			<form action="/register" method="post">
+			    <div>
+			        <label for="nom">Nom :</label>
+			        <input name='nom' type="text" id="nom" />
+			    </div>
+				<br>
+				<div>
+			        <label for="prenom">Prénom :</label>
+			        <input name='prenom' type="text" id="prenom" />
+			    </div>
+				<br>
+				<div>
+			        <label for="login">Nom d'utilisateur :</label>
+			        <input name='login' type="text" id="login" />
+			    </div>
+				<br>
+			    <div>
+			        <label for="email">Email :</label>
+			        <input name='email' type="email" id="email" />
+			    </div>
+				<br>
+			    <div>
+			        <label for="password">Password :</label>
+			        <input name='password' type="password" id="password"></input>
+			    </div>
+				<br>
+				<div>
+			        <label for="password_conf">Password confirmation :</label>
+			        <input name='password_conf' type="password" id="password_conf"></input>
+			    </div>
+				<br>
+			    <div class="button">
+			        <button type="submit">Register</button>
+			    </div>
+			</form>
+		</div>
+	</div>
+	<div class="div_enter_data">
+		<div id="title_div_si">
+			<h2>Sign in</h2>
+		</div>
+		<div id="form_div_si">
+			<form action="/connexion" method="post">
+			    <div>
+			        <label for="login_log">Login :</label>
+			        <input name='login_log' type="text" id="login_log" />
+			    </div>
+				<br>
+				<div>
+			        <label for="password_log">Password :</label>
+			        <input name='password_log' type="password" id="password_log" />
+			    </div>
+				<br>
+			    <div class="button">
+			        <button type="submit">Register</button>
+			    </div>
+			</form>
+		</div>
+	</div>
+	<% } else {%>
+	<div class="div_enter_data">
+		<form action="/deconnexion" method="post">
+		    <div class="button">
+		        <button type="submit">Deconnexion</button>
+		    </div>
+		</form>
+	</div>
+	<% } %>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script>
+	$('#title_div_si').click(function () {
+  		$('#form_div_si').css('display', 'block');
+	});
+	$('#title_div_su').click(function () {
+  		$('#form_div_su').css('display', 'block');
+	});
+	</script>
+  </body>
+</html>
