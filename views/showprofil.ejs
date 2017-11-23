@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<link rel='stylesheet' href='/stylesheets/style_user.css' />
+		<title>Profil user</title>
+	</head>
+	<body>
+		<h2>Profil of <%= user.login %></h2>
+		<div class=".information_user">
+			<p>Nom: <%= user.nom %></p>
+			<p>Prenom: <%= user.prenom %></p>
+			<p>Email: <%= user.email %></p>
+			<p>Sex: <%= user.sex %></p>
+			<p>Orientation sexuelle: <%= user.orientation %></p>
+			<p>Interets: <%= user.interets %></p>
+			<p>Description: <%= user.bio %></p>
+		</div>
+	</body>
+</html>

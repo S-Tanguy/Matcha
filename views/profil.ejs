@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+  <head>
+	 <meta charset="utf-8">
+    <title>Accueil</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+	<h1>Your profil informations</h1>
+	<head>
+    	<% include header %>
+	</head>
+	<div class="data_profil">
+		<h3>Your informations</h3>
+		<form action="/home/edit_profil" method="post">
+			<p>Login: <%= login %></p>
+			<% if (email) { %>
+			<p>Email: <%= email %>
+				<button class="modify_email" type="button">Modify</button>
+			</p>
+			<% } %>
+			<div class="choice_email" <%if(email){ %> style="display:none" <% } %> >
+				<p>Ton email:</p>
+				<input class="input_choice_email" name="email"/><br />
+			</div>
+
+			<% if (nom) { %>
+			<p>Nom: <%= nom %>
+				<button class="modify_nom" type="button">Modify</button>
+			</p>
+			<% } %>
+			<div class="choice_nom" <%if(nom){ %> style="display:none" <% } %> >
+				<p>Ton nom:</p>
+				<input class="input_choice_nom" name="nom"/><br />
+			</div>
+
+
+			<% if (prenom) { %>
+			<p>Prenom: <%= prenom %>
+				<button class="modify_prenom" type="button">Modify</button>
+			</p>
+			<% } %>
+			<div class="choice_prenom" <%if(prenom){ %> style="display:none" <% } %> >
+				<p>Ton prenom:</p>
+				<input class="input_choice_prenom" name="prenom"/><br />
+			</div>
+			<% if (sex) { %>
+				 <p>Sex: <%= sex %>
+					 <button class="modify_sex" type="button">Modify</button>
+				</p>
+			<% } %>
+				<div class="choice_sex" <%if(sex){ %> style="display:none" <% } %> >
+					<p>Choisir sex: </p>
+					<p>
+						Homme: <input class="input_choice_sex" type="radio" value="homme" name="sex" /><br />
+						Femme: <input class="input_choice_sex" type="radio" value="femme" name="sex" />
+					</p>
+				</div>
+			<%if (orientation) { %>
+				 <p>Orientation sexuelle: <%= orientation %>
+					 <button class="modify_orientation" type="button">Modify</button>
+				 </p>
+			<% } %>
+				<div class="choice_orientation" <%if(orientation){ %> style="display:none" <% } %> >
+					<p>Choisir orientation sexuelle: </p>
+					<p>
+						Hetero: <input class="input_choice_orientation" type="radio" value="hetero" name="orientation" /><br />
+						Bi: <input class="input_choice_orientation" type="radio" value="bi" name="orientation" /><br />
+						Hommo: <input class="input_choice_orientation" type="radio" value="hommo" name="orientation" />
+					</p>
+				</div>
+			<%if (bio) { %>
+				 <p>Biographie: <%= bio %>
+					 <button class="modify_bio" type="button">Modify</button>
+				 </p>
+			<% } %>
+				<div class="choice_bio" <%if(orientation){ %> style="display:none" <% } %> >
+					<p>Ta biodescription:</p>
+					<input class="input_choice_bio" name="bio" /><br />
+				</div>
+			<%if (interets) { %>
+				 <p>Interets: <%= interets %>
+					 <button class="modify_interets" type="button">Modify</button>
+				 </p>
+			<% } %>
+				<div class="choice_interets" <%if(interets){ %> style="display:none" <% } %> >
+					<p>Tes centres d'interets: </p>
+					<input class="input_choice_interets" type="text" name="interets" placeholder="#surf, #animaux, #foot..."  /><br />
+				</div>
+
+			<button type="submit" name="button">Valider les modifications</button>
+		</form>
+	</div>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+	<script type="text/javascript">
+		$(document).ready(function(){
+
+			$(".modify_email").click(function() {
+				$(".choice_email").toggle();
+				$(".input_choice_email").val("");
+			});
+
+			$(".modify_nom").click(function() {
+				$(".choice_nom").toggle();
+				$(".input_choice_nom").val("");
+			});
+
+			$(".modify_prenom").click(function() {
+				$(".choice_prenom").toggle();
+				$(".input_choice_prenom").val("");
+			});
+
+			$(".modify_sex").click(function() {
+				$(".choice_sex").toggle();
+				$(".input_choice_sex").prop("checked", false);
+			});
+
+			$(".modify_orientation").click(function() {
+				$(".choice_orientation").toggle();
+				$(".input_choice_orientation").prop("checked", false);
+			});
+
+			$(".modify_bio").click(function() {
+				$(".choice_bio").toggle();
+				$(".input_choice_bio").val("");
+			});
+
+			$(".modify_interets").click(function() {
+				$(".choice_interets").toggle();
+				$(".input_choice_interets").val("");
+			});
+		});
+	</script>
+
+  </body>
+</html>
