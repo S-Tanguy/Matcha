@@ -19,46 +19,46 @@
 			<h2>Sign up</h2>
 		</div>
 
-
-		<div id="form_div_su">
-			<form action="/register" method="post">
-			    <div>
-			        <label for="nom">Nom :</label>
-			        <input name='nom' type="text" id="nom" />
-			    </div>
-				<br>
-				<div>
-			        <label for="prenom">Prénom :</label>
-			        <input name='prenom' type="text" id="prenom" />
-			    </div>
-				<br>
-				<div>
-			        <label for="login">Nom d'utilisateur :</label>
-			        <input name='login' type="text" id="login" />
-			    </div>
-				<br>
-			    <div>
-			        <label for="email">Email :</label>
-			        <input name='email' type="email" id="email" />
-			    </div>
-				<br>
-			    <div>
-			        <label for="password">Password :</label>
-			        <input name='password' type="password" id="password"></input>
-			    </div>
-				<br>
-				<div>
-			        <label for="password_conf">Password confirmation :</label>
-			        <input name='password_conf' type="password" id="password_conf"></input>
-			    </div>
-				<br>
-			    <div class="button">
-			        <button type="submit">Register</button>
-			    </div>
-			</form>
-		</div>
-	</div>
-
+<!--   TEST AJAX -->
+                		<div id="form_div_su">
+                			<form id="register_form" method="post">
+                			    <div>
+                			        <label for="nom">Nom :</label>
+                			        <input name='nom' type="text" id="nom" />
+                			    </div>
+                				<br>
+                				<div>
+                			        <label for="prenom">Prénom :</label>
+                			        <input name='prenom' type="text" id="prenom" />
+                			    </div>
+                				<br>
+                				<div>
+                			        <label for="login">Nom d'utilisateur :</label>
+                			        <input name='login' type="text" id="login" />
+                			    </div>
+                				<br>
+                			    <div>
+                			        <label for="email">Email :</label>
+                			        <input name='email' type="email" id="email" />
+                			    </div>
+                				<br>
+                			    <div>
+                			        <label for="password">Password :</label>
+                			        <input name='password' type="password" id="password"></input>
+                			    </div>
+                				<br>
+                				<div>
+                			        <label for="password_conf">Password confirmation :</label>
+                			        <input name='password_conf' type="password" id="password_conf"></input>
+                			    </div>
+                				<br>
+                			    <div >
+                			        <input id="fdp" class="buttontest" type="button" value="Sign up"/>
+                			    </div>
+                			</form>
+                		</div>
+                	</div>
+<!-- FIN TEST -->
 
 	<div class="div_enter_data">
 		<div id="title_div_si">
@@ -77,7 +77,7 @@
 			    </div>
 				<br>
 			    <div class="button">
-			        <button type="submit">Register</button>
+			        <button type="submit">Sign in</button>
 			    </div>
 			</form>
 		</div>
@@ -93,6 +93,41 @@
 		</form>
 	</div>
 	<% } %>
+
+  <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js"></script>
+
+  <script type="text/javascript">
+  $(document).ready(function(){
+
+    $('#fdp').click(function () {
+      var coord;
+            if(navigator.geolocation){
+              navigator.geolocation.getCurrentPosition(handleGetCurrentPosition, onError);
+              coord {
+                latitude: test,
+                longitude: test2
+              }
+            }
+            $.ajax({
+              type: 'post',
+              data: JSON.stringify({
+                    nom: $("#nom").val(),
+                    prenom: $("#prenom").val(),
+                    login: $("#login").val(),
+                    email: $('#email').val(),
+                    password: $('#password').val(),
+                    password_conf: $("#password_conf").val()
+                    }),
+              contentType: 'application/json; charset=utf-8',
+              url: 'testajax',
+            });
+            $(':input','#register_form').not(':button, :submit, :reset, :hidden')
+            .val('')
+            .removeAttr('checked')
+            .removeAttr('selected');
+        });
+      });
+  </script>
 
   </body>
 </html>
