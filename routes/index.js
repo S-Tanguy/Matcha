@@ -3,6 +3,7 @@ var router = express.Router();
 var mongo = require('mongodb');
 var assert = require('assert');
 var bcrypt = require('bcrypt');
+var request = require('request');
 
 var url = 'mongodb://localhost:27017/db_matcha';
 
@@ -44,6 +45,19 @@ router.get('/', function(req, res, next) {
 	}
 	res.redirect('/');
 });*/
+const getLoc = function() {
+	return new Promise(function(res, rej) {
+		request('http://freegeoip.net/json/', function(error, response, body) {
+			if (error) { rej(error) }
+			result = JSON.parse(body);
+			let json = {}
+			json.longitude = result.longitude;
+			json.latitude = result.latitude;
+			// console.log(longitude + "IN");
+			res(json);
+		});
+	})
+}
 
 router.post('/testajax', function(req, res, next) {
 	if (req.body.nom && req.body.prenom && req.body.login && req.body.email && req.body.password && req.body.password_conf
@@ -51,7 +65,7 @@ router.post('/testajax', function(req, res, next) {
 	{
 		mongo.connect(url, function(err, db) {
 			assert.equal(null, err);
-			bcrypt.hash(req.body.password, 5, function( err, bcryptedPassword) {
+			bcrypt.hash(req.body.password, 5, async function(err, bcryptedPassword) {
 				if (err) {
 					console.log("Pb avec le bcrypt");
 				}
@@ -60,17 +74,45 @@ router.post('/testajax', function(req, res, next) {
 					prenom: req.body.prenom,
 					login: req.body.prenom,
 					email: req.body.email,
-					password: bcryptedPassword
+					password: bcryptedPassword,
 				};
-				db.collection('users').insertOne(user, function(err, result) {
-					assert.equal(null, err);
-					console.log("User add in db");
-					db.close();
-				});
+				if (req.body.accept == 0){
+					let coord = await getLoc();
+					console.log(coord);
+					user.longitude = coord.longitude;
+					user.latitude = coord.latitude;
+					// console.log(longitude);
+					db.collection('users').insertOne(user, function(err, result) {
+						assert.equal(null, err);
+						console.log("User add in db");
+						db.close();
+					});
+				}
+				else {
+					var user = {
+						nom: req.body.nom,
+						prenom: req.body.prenom,
+						login: req.body.prenom,
+						email: req.body.email,
+						password: bcryptedPassword
+					};
+					user.longitude = req.body.longitude;
+					user.latitude = req.body.latitude;
+					// console.log(longitude);
+					db.collection('users').insertOne(user, function(err, result) {
+						assert.equal(null, err);
+						console.log("User add in db");
+						db.close();
+					});
+				}
+				let i = 0;
+				if (i === 0) {
+					console.log("string");
+				}
 			});
 		});
 	}
-res.redirect('/');
+	res.redirect('/');
 
 });
 

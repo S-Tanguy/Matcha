@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>Accueil</title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel='stylesheet' href='/stylesheets/home.css' />
   </head>
   <body>
     <p>Welcome to <%= title %></p>
@@ -14,5 +14,20 @@
 		    </div>
 		</form>
 	</div>
+
+	<div class="suggestions">
+		<% users.forEach(function(user){ %>
+		<div class="user_suggestion">
+			<p>
+    			<%= user.nom %> - <%= user.prenom %> - <%= user.login %>
+			</p>
+			<a href='users/<%= user.login %>'>Go profil</a>
+		</div>
+  		<% }); %>
+	</div>
+	<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js"></script>
+	<script type="text/javascript">
+
+	</script>
   </body>
 </html>

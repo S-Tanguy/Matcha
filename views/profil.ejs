@@ -88,11 +88,20 @@
 					<input class="input_choice_interets" type="text" name="interets" placeholder="#surf, #animaux, #foot..."  /><br />
 				</div>
 
+				<%if (photos) { %>
+					 <p>Photos: <%= photos %>
+						 <button class="modify_photos" type="button">Modify</button>
+					 </p>
+				<% } %>
+					<div class="choice_photos" <%if(photos){ %> style="display:none" <% } %> >
+						<p>Tes photos: </p>
+						<input class="input_choice_photos" type="file" name="photos" /><br />
+					</div>
+
 			<button type="submit" name="button">Valider les modifications</button>
 		</form>
 	</div>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-
 	<script type="text/javascript">
 		$(document).ready(function(){
 
@@ -130,6 +139,12 @@
 				$(".choice_interets").toggle();
 				$(".input_choice_interets").val("");
 			});
+
+			$(".modify_photos").click(function() {
+				$(".choice_photos").toggle();
+				$(".input_choice_photos").val("");
+			});
+
 		});
 	</script>
 

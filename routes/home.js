@@ -6,11 +6,18 @@ var assert = require('assert');
 var url = 'mongodb://localhost:27017/db_matcha';
 
 
-router.get('/', function(req, res, next) {
+router.get('/', async function(req, res, next) {
 	if (!req.session.user) {
 		res.redirect('/');
 	} else {
-		res.render('home', { title: req.session.user });
+		let db = await mongo.connect(url);
+		let users = await db.collection('users').find({login: {$ne: 'toto'}});
+		let array = [];
+		users.forEach(function(doc, err) {
+			array.push(doc);
+		}, function() {
+			res.render('home', { title: req.session.user, users: array, toto: "bite"});
+		})
 	}
 });
 
@@ -34,8 +41,8 @@ router.get('/profil', function(req, res, next) {
 										sex: user.sex,
 										orientation: user.orientation,
 										bio: user.bio,
-										interets: user.interets//,
-									//	images: user.images
+										interets: user.interets,
+										photos: user.images
 										});
 				}
 			});
@@ -97,6 +104,13 @@ router.post('/edit_profil', function(req, res, next) {
 	 			      { $set: { interets: req.body.interets }
 				  });
 				}
+				if (req.body.photos != "" && req.body.photos != null)
+				{
+					db.collection('users').updateOne(
+	 			      { login: req.session.user },
+	 			      { $set: { photos: req.body.photos }
+				  });
+				}
 			   /*db.collection('users').updateOne(
 			      { login: req.session.user },
 			      { $set: { sex: req.body.sex//,
@@ -111,6 +125,7 @@ router.post('/edit_profil', function(req, res, next) {
 	}
 	res.redirect('/home/profil');
 });
+
 
 router.post('/deconnexion', function(req, res, next) {
 	if (req.session) {

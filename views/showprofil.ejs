@@ -16,5 +16,30 @@
 			<p>Interets: <%= user.interets %></p>
 			<p>Description: <%= user.bio %></p>
 		</div>
+		<% if (user.accept == 1) { %>
+		<div id="map" style="width:400px;height:400px">My map will go here</div>
+		<% } %>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDGM-pfzY1pSY3EpFx2xZhmB6RHpHKj-RA&callback=myMap"></script>
+		<script type="text/javascript">
+		if (<%= user.accept %>){
+		initMap();
+		}
+
+		function initMap() {
+  			var myLatLng = {lat: <%= user.latitude %>, lng: <%= user.longitude %>};
+
+			  var map = new google.maps.Map(document.getElementById('map'), {
+			    zoom: 12,
+			    center: myLatLng
+			  });
+
+			  var marker = new google.maps.Marker({
+			    position: myLatLng,
+			    map: map,
+			    title: 'Hello World!'
+			  });
+		  }
+		</script>
 	</body>
 </html>

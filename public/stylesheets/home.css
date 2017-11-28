@@ -1,0 +1,11 @@
+.suggestions {
+	border: 1px solid black;
+	width: 100%;
+	height: 500px;
+	margin-top: 60px;
+}
+
+.user_suggestion {
+	border: 1px solid black;
+	display: inline-block;
+}

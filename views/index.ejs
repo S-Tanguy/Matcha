@@ -53,7 +53,7 @@
                 			    </div>
                 				<br>
                 			    <div >
-                			        <input id="fdp" class="buttontest" type="button" value="Sign up"/>
+                			        <input id="register_bouton" class="buttontest" type="button" value="Sign up"/>
                 			    </div>
                 			</form>
                 		</div>
@@ -98,16 +98,14 @@
 
   <script type="text/javascript">
   $(document).ready(function(){
+	var toto = new Array();
+	var accept = 0;
 
-    $('#fdp').click(function () {
-      var coord;
-            if(navigator.geolocation){
-              navigator.geolocation.getCurrentPosition(handleGetCurrentPosition, onError);
-              coord {
-                latitude: test,
-                longitude: test2
-              }
-            }
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+    }
+
+    $('#register_bouton').click(function () {
             $.ajax({
               type: 'post',
               data: JSON.stringify({
@@ -116,7 +114,10 @@
                     login: $("#login").val(),
                     email: $('#email').val(),
                     password: $('#password').val(),
-                    password_conf: $("#password_conf").val()
+                    password_conf: $("#password_conf").val(),
+					longitude: toto[0],
+					latitude: toto[1],
+					accept: accept
                     }),
               contentType: 'application/json; charset=utf-8',
               url: 'testajax',
@@ -126,6 +127,13 @@
             .removeAttr('checked')
             .removeAttr('selected');
         });
+
+		function showPosition(position) {
+			toto[0] = position.coords.longitude;
+			toto[1] = position.coords.latitude;
+			accept = 1;
+		}
+
       });
   </script>
 
