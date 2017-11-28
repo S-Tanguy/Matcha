@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var mongo = require('mongodb');
 var assert = require('assert');
+var multer = require('multer');
 
 var url = 'mongodb://localhost:27017/db_matcha';
 
@@ -50,7 +51,18 @@ router.get('/profil', function(req, res, next) {
 	}
 });
 
-router.post('/edit_profil', function(req, res, next) {
+var storage = multer.diskStorage({
+						destination: function (req, file, cb) {
+								cb(null, 'uploads/')
+						},
+						filename: function (req, file, cb) {
+								cb(null, file.fieldname + '-' + Date.now() + '.jpg')
+							}
+});
+
+var upload = multer({ storage: storage }).single('file');
+
+router.post('/edit_profil', upload,function(req, res, next) {
 	if (req.session.user) {
 			mongo.connect(url, function(err, db){
 				console.log('ici');
@@ -104,8 +116,19 @@ router.post('/edit_profil', function(req, res, next) {
 	 			      { $set: { interets: req.body.interets }
 				  });
 				}
-				if (req.body.photos != "" && req.body.photos != null)
+				if (req.body.photos != "")
 				{
+					upload(req, res, function (err) {
+				    if (err) {
+				      // An error occurred when uploading
+				      return
+				    }
+						console.log('it\'s good');
+				    // Everything went fine
+				  });
+
+
+
 					db.collection('users').updateOne(
 	 			      { login: req.session.user },
 	 			      { $set: { photos: req.body.photos }

@@ -17,34 +17,6 @@ router.get('/', function(req, res, next) {
 	});
 });
 
-/*router.post('/register', function(req, res, next) {
-	if (req.body.nom && req.body.prenom && req.body.login && req.body.email && req.body.password && req.body.password_conf
-		&& (req.body.password == req.body.password_conf))
-	{
-
-		mongo.connect(url, function(err, db) {
-			assert.equal(null, err);
-			bcrypt.hash(req.body.password, 5, function( err, bcryptedPassword) {
-				if (err) {
-					console.log("Pb avec le bcrypt");
-				}
-				var user = {
-					nom: req.body.nom,
-					prenom: req.body.prenom,
-					login: req.body.prenom,
-					email: req.body.email,
-					password: bcryptedPassword
-				};
-				db.collection('users').insertOne(user, function(err, result) {
-					assert.equal(null, err);
-					console.log("User add in db");
-					db.close();
-				});
-			});
-		});
-	}
-	res.redirect('/');
-});*/
 const getLoc = function() {
 	return new Promise(function(res, rej) {
 		request('http://freegeoip.net/json/', function(error, response, body) {
@@ -75,6 +47,7 @@ router.post('/testajax', function(req, res, next) {
 					login: req.body.prenom,
 					email: req.body.email,
 					password: bcryptedPassword,
+					accept: req.body.accept
 				};
 				if (req.body.accept == 0){
 					let coord = await getLoc();
@@ -89,13 +62,6 @@ router.post('/testajax', function(req, res, next) {
 					});
 				}
 				else {
-					var user = {
-						nom: req.body.nom,
-						prenom: req.body.prenom,
-						login: req.body.prenom,
-						email: req.body.email,
-						password: bcryptedPassword
-					};
 					user.longitude = req.body.longitude;
 					user.latitude = req.body.latitude;
 					// console.log(longitude);

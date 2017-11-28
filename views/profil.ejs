@@ -12,7 +12,7 @@
 	</head>
 	<div class="data_profil">
 		<h3>Your informations</h3>
-		<form action="/home/edit_profil" method="post">
+		<form action="/home/edit_profil" method="post" enctype="multipart/form-data">
 			<p>Login: <%= login %></p>
 			<% if (email) { %>
 			<p>Email: <%= email %>
@@ -95,7 +95,7 @@
 				<% } %>
 					<div class="choice_photos" <%if(photos){ %> style="display:none" <% } %> >
 						<p>Tes photos: </p>
-						<input class="input_choice_photos" type="file" name="photos" /><br />
+						<input class="input_choice_photos" type="file" name="file" /><br />
 					</div>
 
 			<button type="submit" name="button">Valider les modifications</button>
