@@ -35,8 +35,11 @@ router.post('/testajax', function(req, res, next) {
 	if (req.body.nom && req.body.prenom && req.body.login && req.body.email && req.body.password && req.body.password_conf
 		&& req.body.orientation && req.body.sex && req.body.date && (req.body.password == req.body.password_conf))
 	{
-		mongo.connect(url, function(err, db) {
-			//db.collection('users').createIndex( { loc : "2dsphere" } )
+		mongo.connect(url, async function(err, db) {
+			if (await db.collection('users').find().count() == 0) {
+				db.collection('users').createIndex( { loc : "2dsphere" } )
+				console.log('FDP');
+			}
 			assert.equal(null, err);
 			bcrypt.hash(req.body.password, 5, async function(err, bcryptedPassword) {
 				if (err) {
@@ -59,7 +62,7 @@ router.post('/testajax', function(req, res, next) {
 					user.longitude = coord.longitude;
 					user.latitude = coord.latitude;
 					// console.log(longitude);
-					db.collection('users').insertOne(user, function(err, result) {
+					await db.collection('users').insertOne(user, function(err, result) {
 						assert.equal(null, err);
 						console.log("User add in db");
 						db.close();
@@ -69,7 +72,7 @@ router.post('/testajax', function(req, res, next) {
 					user.longitude = req.body.longitude;
 					user.latitude = req.body.latitude;
 					// console.log(longitude);
-					db.collection('users').insertOne(user, function(err, result) {
+					await db.collection('users').insertOne(user, function(err, result) {
 						assert.equal(null, err);
 						console.log("User add in db");
 						db.close();
@@ -77,8 +80,9 @@ router.post('/testajax', function(req, res, next) {
 				}
 			});
 		});
+		//res.redirect('/');
 	}
-	res.redirect('/');
+	//res.redirect('/');
 
 });
 
