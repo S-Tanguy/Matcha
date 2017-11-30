@@ -33,9 +33,10 @@ const getLoc = function() {
 
 router.post('/testajax', function(req, res, next) {
 	if (req.body.nom && req.body.prenom && req.body.login && req.body.email && req.body.password && req.body.password_conf
-		&& (req.body.password == req.body.password_conf))
+		&& req.body.orientation && req.body.sex && req.body.date && (req.body.password == req.body.password_conf))
 	{
 		mongo.connect(url, function(err, db) {
+			//db.collection('users').createIndex( { loc : "2dsphere" } )
 			assert.equal(null, err);
 			bcrypt.hash(req.body.password, 5, async function(err, bcryptedPassword) {
 				if (err) {
@@ -46,6 +47,9 @@ router.post('/testajax', function(req, res, next) {
 					prenom: req.body.prenom,
 					login: req.body.prenom,
 					email: req.body.email,
+					sex: req.body.sex,
+					orientation: req.body.orientation,
+					date: req.body.date,
 					password: bcryptedPassword,
 					accept: req.body.accept
 				};
@@ -71,10 +75,6 @@ router.post('/testajax', function(req, res, next) {
 						db.close();
 					});
 				}
-				let i = 0;
-				if (i === 0) {
-					console.log("string");
-				}
 			});
 		});
 	}
@@ -98,6 +98,8 @@ router.post('/connexion', function(req, res, next) {
 						}
     					if (findOne){
 							req.session.connect = true;
+							req.session.orientation = user.orientation;
+							req.session.sex = user.sex;
 							req.session.user = req.body.login_log;
 							res.redirect('/home');
 						}

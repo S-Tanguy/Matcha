@@ -12,7 +12,34 @@ router.get('/', async function(req, res, next) {
 		res.redirect('/');
 	} else {
 		let db = await mongo.connect(url);
-		let users = await db.collection('users').find({login: {$ne: 'toto'}});
+		let users;
+		if (req.session.sex == "homme" && req.session.orientation == "hetero")
+		{
+			users = await db.collection('users').find({login: {$ne: req.session.user}, sex: 'femme', orientation: {$ne: 'hommo'}});
+		}
+		else if (req.session.sex == "homme" && req.session.orientation == "hommo")
+		{
+			users = await db.collection('users').find({login: {$ne: req.session.user}, sex: 'homme', orientation: {$ne: 'hetero'}});
+		}
+		else if (req.session.sex == "homme" && req.session.orientation == "bi")
+		{
+			users = await db.collection('users').find( { $or: [ { sex: 'homme', orientation: { $ne: 'hetero' } }, { sex: 'femme', orientation: { $ne: 'hommo' } } ] } );
+		}
+		else if (req.session.sex == "femme" && req.session.orientation == "hetero")
+		{
+			users = await db.collection('users').find({login: {$ne: req.session.user}, sex: 'homme', orientation: {$ne: 'hommo'}});
+		}
+		else if (req.session.sex == "femme" && req.session.orientation == "hommo")
+		{
+			users = await db.collection('users').find({login: {$ne: req.session.user}, sex: 'femme', orientation: {$ne: 'hetero'}});
+		}
+		else if (req.session.sex == "femme" && req.session.orientation == "bi")
+		{
+			users = await db.collection('users').find( { $or: [ { sex: 'femme', orientation: { $ne: 'hetero' } }, { sex: 'homme', orientation: { $ne: 'hommo' } } ] } );
+		}
+		else {
+			console.log("PROBLEME DANS LA PROPOSITION DE LA SUGGESTION");
+		}
 		let array = [];
 		users.forEach(function(doc, err) {
 			array.push(doc);
@@ -134,15 +161,6 @@ router.post('/edit_profil', upload,function(req, res, next) {
 	 			      { $set: { photos: req.body.photos }
 				  });
 				}
-			   /*db.collection('users').updateOne(
-			      { login: req.session.user },
-			      { $set: { sex: req.body.sex//,
-					  /*orientation: req.bodyorientation,
-					  bio: req.body.bio,
-				   	interets: req.body.interets,
-				images: req.body.images } }
-			);*/
-			//NE PAS OUBLIER LES IMAGES
 			   db.close();
 			});
 	}

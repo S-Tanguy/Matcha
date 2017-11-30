@@ -41,7 +41,29 @@
                 			        <label for="email">Email :</label>
                 			        <input name='email' type="email" id="email" />
                 			    </div>
+								<br>
+								<div>
+								<label for="sex_homme">Je suis un homme:</label>
+								<input type="radio" value="homme" name="sex" /><br />
+								<label for="sex_femme">Je suis une femme:</label>
+								<input type="radio" value="femme" name="sex" />
+								</div>
                 				<br>
+								<div>
+									<label for="orientation_hetero">Je suis hetero:</label>
+									<input type="radio" value="hetero" name="orientation" /><br />
+									<label for="orientation_hommo">Je suis hommo:</label>
+									<input type="radio" value="hommo" name="orientation" /><br />
+									<label for="orientation_bi">Je suis bi:</label>
+									<input type="radio" value="bi" name="orientation" /><br />
+								</div>
+								<br>
+                				<br>
+								<div class="date">
+									<label for="date">Date de naissance :</label>
+									<input type="date" name="date" id="date">
+								</div>
+								<br>
                 			    <div>
                 			        <label for="password">Password :</label>
                 			        <input name='password' type="password" id="password"></input>
@@ -113,6 +135,9 @@
                     prenom: $("#prenom").val(),
                     login: $("#login").val(),
                     email: $('#email').val(),
+					sex: $("input[name='sex']:checked").val(),
+					orientation: $("input[name='orientation']:checked").val(),
+					date: $('#date').val(),
                     password: $('#password').val(),
                     password_conf: $("#password_conf").val(),
 					longitude: toto[0],
