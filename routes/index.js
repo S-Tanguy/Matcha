@@ -58,25 +58,34 @@ router.post('/testajax', function(req, res, next) {
 				};
 				if (req.body.accept == 0){
 					let coord = await getLoc();
+					var loc = {
+						type: "Point",
+						coordinates: [coord.longitude, coord.latitude]
+					}
 					console.log(coord);
+					user.loc = loc;
 					user.longitude = coord.longitude;
 					user.latitude = coord.latitude;
-					// console.log(longitude);
 					await db.collection('users').insertOne(user, function(err, result) {
 						assert.equal(null, err);
 						console.log("User add in db");
-						db.close();
+						res.redirect('/');
 					});
 				}
 				else {
+					var loc = {
+						type: "Point",
+						coordinates: [req.body.longitude, req.body.latitude]
+					}
+					user.loc = loc;
 					user.longitude = req.body.longitude;
 					user.latitude = req.body.latitude;
-					// console.log(longitude);
 					await db.collection('users').insertOne(user, function(err, result) {
 						assert.equal(null, err);
 						console.log("User add in db");
-						db.close();
+						res.redirect('/');
 					});
+					db.close();
 				}
 			});
 		});
@@ -105,6 +114,8 @@ router.post('/connexion', function(req, res, next) {
 							req.session.orientation = user.orientation;
 							req.session.sex = user.sex;
 							req.session.user = req.body.login_log;
+							req.session.longitude = user.loc.coordinates[0];
+							req.session.latitude = user.loc.coordinates[1];
 							res.redirect('/home');
 						}
 						else {

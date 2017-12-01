@@ -15,27 +15,87 @@ router.get('/', async function(req, res, next) {
 		let users;
 		if (req.session.sex == "homme" && req.session.orientation == "hetero")
 		{
-			users = await db.collection('users').find({login: {$ne: req.session.user}, sex: 'femme', orientation: {$ne: 'hommo'}});
+			users = await db.collection('users').find({login: {$ne: req.session.user}, sex: 'femme', orientation: {$ne: 'hommo'}, loc: {
+																																	$nearSphere: {
+     																																	$geometry: {
+        																																	type : "Point",
+        																																	coordinates : [ req.session.longitude, req.session.latitude ]
+     																																	},
+     																																$minDistance: 0,
+     																																$maxDistance: 100000
+  																																	}
+																																}
+																															});
 		}
 		else if (req.session.sex == "homme" && req.session.orientation == "hommo")
 		{
-			users = await db.collection('users').find({login: {$ne: req.session.user}, sex: 'homme', orientation: {$ne: 'hetero'}});
+			users = await db.collection('users').find({login: {$ne: req.session.user}, sex: 'homme', orientation: {$ne: 'hetero'}, loc: {
+			  																														$nearSphere: {
+			     																														$geometry: {
+			        																														type : "Point",
+			        																														coordinates : [ req.session.longitude, req.session.latitude ]
+			     																														},
+			     																														$minDistance: 0,
+			     																														$maxDistance: 100000
+			  																														}
+																																}
+																															});
 		}
 		else if (req.session.sex == "homme" && req.session.orientation == "bi")
 		{
-			users = await db.collection('users').find( { $or: [ { sex: 'homme', orientation: { $ne: 'hetero' } }, { sex: 'femme', orientation: { $ne: 'hommo' } } ] } );
+			users = await db.collection('users').find( {login: {$ne: req.session.user}, $or: [ { sex: 'homme', orientation: { $ne: 'hetero' } }, { sex: 'femme', orientation: { $ne: 'hommo' } } ], loc: {
+			  																																															$nearSphere: {
+			     																																															$geometry: {
+			        																																															type : "Point",
+			        																																															coordinates : [ req.session.longitude, req.session.latitude ]
+			     																																															},
+			     																																															$minDistance: 0,
+			     																																															$maxDistance: 100000
+			  																																															}
+																																																	}
+																																																});
 		}
 		else if (req.session.sex == "femme" && req.session.orientation == "hetero")
 		{
-			users = await db.collection('users').find({login: {$ne: req.session.user}, sex: 'homme', orientation: {$ne: 'hommo'}});
+			users = await db.collection('users').find({login: {$ne: req.session.user}, sex: 'homme', orientation: {$ne: 'hommo'}, loc: {
+			  																														$nearSphere: {
+			     																														$geometry: {
+			        																														type : "Point",
+			        																														coordinates : [ req.session.longitude, req.session.latitude ]
+			     																														},
+			     																														$minDistance: 0,
+			     																														$maxDistance: 100000
+			  																														}
+																																}
+																															});
 		}
 		else if (req.session.sex == "femme" && req.session.orientation == "hommo")
 		{
-			users = await db.collection('users').find({login: {$ne: req.session.user}, sex: 'femme', orientation: {$ne: 'hetero'}});
+			users = await db.collection('users').find({login: {$ne: req.session.user}, sex: 'femme', orientation: {$ne: 'hetero'}, loc: {
+			  																															$nearSphere: {
+			     																															$geometry: {
+			        																															type : "Point",
+			        																															coordinates : [ req.session.longitude, req.session.latitude ]
+			     																															},
+			     																															$minDistance: 0,
+			     																															$maxDistance: 100000
+			  																															}
+																																	}
+																																});
 		}
 		else if (req.session.sex == "femme" && req.session.orientation == "bi")
 		{
-			users = await db.collection('users').find( { $or: [ { sex: 'femme', orientation: { $ne: 'hetero' } }, { sex: 'homme', orientation: { $ne: 'hommo' } } ] } );
+			users = await db.collection('users').find( {login: {$ne: req.session.user},  $or: [ { sex: 'femme', orientation: { $ne: 'hetero' } }, { sex: 'homme', orientation: { $ne: 'hommo' } } ], loc: {
+  																																																		$nearSphere: {
+     																																																		$geometry: {
+        																																																		type : "Point",
+        																																																		coordinates : [ req.session.longitude, req.session.latitude ]
+     																																																		},
+     																																																		$minDistance: 0,
+     																																																		$maxDistance: 100000
+  																																																		}
+																																																	}
+																																																 });
 		}
 		else {
 			console.log("PROBLEME DANS LA PROPOSITION DE LA SUGGESTION");
