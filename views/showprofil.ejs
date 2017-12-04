@@ -12,6 +12,7 @@
 			<p>Prenom: <%= user.prenom %></p>
 			<p>Email: <%= user.email %></p>
 			<p>Sex: <%= user.sex %></p>
+			<p>Age: <%= user.age %> ans</p>
 			<p>Orientation sexuelle: <%= user.orientation %></p>
 			<p>Interets: <%= user.interets %></p>
 			<p>Description: <%= user.bio %></p>
@@ -23,6 +24,9 @@
 			 <p><%= user.login %>, ne souhaite pas afficher sa localisation</p>
 		</div>
 		<% } %>
+		<div class="like">
+			<a id="like_button" >Je like <%= user.login %></a>
+		</div>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCYV5V1wefNwQQ_5ukp4SLtcqmrUh2Kp48"></script>
 		<script type="text/javascript">
@@ -43,6 +47,17 @@
 			    title: 'Hello World!'
 			  });
 		  }
+
+		  $('#like_button').click(function () {
+	              $.ajax({
+	                type: 'post',
+	                data: JSON.stringify({
+						user: <%= user.login %>
+					}),
+	                contentType: 'application/json; charset=utf-8',
+	                url: 'like',
+	              });
+	          });
 		</script>
 	</body>
 </html>

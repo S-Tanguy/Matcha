@@ -31,6 +31,33 @@ const getLoc = function() {
 	})
 }
 
+function dateDiff(dateold, datenew)
+{
+  var ynew = datenew.getFullYear();
+  var mnew = datenew.getMonth();
+  var dnew = datenew.getDate();
+  var yold = dateold.getFullYear();
+  var mold = dateold.getMonth();
+  var dold = dateold.getDate();
+  var diff = datenew - dateold;
+  if(mold > mnew) diff--;
+  else
+  {
+    if(mold == mnew)
+    {
+      if(dold > dnew) diff--;
+    }
+  }
+  return diff;
+}
+
+const Age = function(birthday) {
+	return new Promise(function(res, rej) {
+		birthday = new Date(birthday);
+  		res(new Number((new Date().getTime() - birthday.getTime()) / 31536000000).toFixed(0));
+	})
+}
+
 router.post('/testajax', function(req, res, next) {
 	if (req.body.nom && req.body.prenom && req.body.login && req.body.email && req.body.password && req.body.password_conf
 		&& req.body.orientation && req.body.sex && req.body.date && (req.body.password == req.body.password_conf))
@@ -48,13 +75,18 @@ router.post('/testajax', function(req, res, next) {
 				var user = {
 					nom: req.body.nom,
 					prenom: req.body.prenom,
-					login: req.body.prenom,
+					login: req.body.login,
 					email: req.body.email,
 					sex: req.body.sex,
 					orientation: req.body.orientation,
-					date: req.body.date,
+					age: await Age(new Date(req.body.date)),
 					password: bcryptedPassword,
-					accept: req.body.accept
+					accept: req.body.accept,
+					like: [],
+					liker: []
+
+					//interets: null,
+					//bio: null
 				};
 				if (req.body.accept == 0){
 					let coord = await getLoc();

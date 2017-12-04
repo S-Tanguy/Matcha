@@ -15,11 +15,20 @@
 		</form>
 	</div>
 
+	<div class="filtres">
+		<h2>Filtres: </h2>
+		<form class="form_filtres" method="post">
+			<input type="text" name="nom">
+  			<input id="filtres_bouton" value="appliquer" type="submit">
+		</form>
+	</div>
 	<div class="suggestions">
 		<% users.forEach(function(user){ %>
 		<div class="user_suggestion">
 			<p>
     			<%= user.nom %> - <%= user.prenom %> - <%= user.login %>
+				<br>
+				Age : <%= user.age %>
 			</p>
 			<h3><%= user.sex %> - <%= user.orientation %></h3>
 			<a href='users/<%= user.login %>'>Go profil</a>
@@ -28,7 +37,19 @@
 	</div>
 	<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js"></script>
 	<script type="text/javascript">
-
+	$('#filtres_bouton').click(function () {
+			$.ajax({
+			  type: 'post',
+			  data: JSON.stringify({
+					}),
+			  contentType: 'application/json; charset=utf-8',
+			  url: 'testajax',
+			});
+			//$(':input','#register_form').not(':button, :submit, :reset, :hidden')
+			//.val('')
+			//.removeAttr('checked')
+			//.removeAttr('selected');
+		});
 	</script>
   </body>
 </html>

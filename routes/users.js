@@ -22,4 +22,21 @@ router.get('/:login', function(req, res, next) {
 	});
 });
 
+router.post('/like', function(req, res, next) {
+	mongo.connect(url, async function(err, db){
+		await db.collection('users').update(
+   			{ login: req.session.user },
+   				{ $push: { like: "" + req.body.user + "" } }
+			);
+		console.log(req.session.user);
+		console.log(req.body.user);
+		await db.collection('users').update(
+			{ login: req.body.user.toString() },
+				{ $push: { liker: "" + req.session.user + "" } }
+		);
+			console.log(req.session.user);
+			console.log(req.body.user);
+	});
+});
+
 module.exports = router;
