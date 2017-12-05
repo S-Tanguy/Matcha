@@ -33,7 +33,6 @@
 		if (<%= user.accept %>){
 		initMap();
 		}
-
 		function initMap() {
   			var myLatLng = {lat: <%= user.latitude %>, lng: <%= user.longitude %>};
 			  var map = new google.maps.Map(document.getElementById('map'), {
@@ -52,7 +51,7 @@
 	              $.ajax({
 	                type: 'post',
 	                data: JSON.stringify({
-						user: <%= user.login %>
+						user: <%-JSON.stringify(user.login)%>
 					}),
 	                contentType: 'application/json; charset=utf-8',
 	                url: 'like',
