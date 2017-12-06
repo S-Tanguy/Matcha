@@ -42,13 +42,25 @@ app.use('/users', users);
 //POUR LE CHAT
 io.on('connection', function(socket){
   console.log('a user connected');
+
   socket.on('chat message', function(msg){
+	  socket.emit('new message', msg);
+	  	socket.broadcast.emit('new message', msg);
     console.log('message: ' + msg);
   });
+
   socket.on('disconnect', function(){
     console.log('user disconnected');
   });
 });
+
+
+
+
+
+
+
+
 
 http.listen(3003, function(){
   console.log('listening on *:3003');

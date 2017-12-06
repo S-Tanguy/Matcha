@@ -40,8 +40,7 @@
     <form id="mess" action="">
       <input type="text" name="msg" id="m" autocomplete="off" /><button id="but">Send</button>
     </form>
-  </div>
-
+</div>
 <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js"></script>
   <script src="http://localhost:3003/socket.io/socket.io.js"></script>
   <script type="text/javascript">
@@ -51,18 +50,22 @@
     var socket = io.connect('http://localhost:3003');
     $('#mess').submit(function(){
       socket.emit('chat message', $('#m').val());
-      $('#messages').append($('<li>').text($('#m').val()))
+      //$('#messages').append($('<li>').text($('#m').val()))
       $('#m').val('');
       return false;
     });
 
+	socket.on('new message', function(data) {
+		$('#messages').append($('<li>').text(data));
+	});
 
-
-  //  socket.on('chat message', function(msg){
-  //    alert('flute');
-  //    $('#messages').append($('<li>').text(msg));
-  //  });
   });
+
+
+
+
+
+
 
 });
   </script>
