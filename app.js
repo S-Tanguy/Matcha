@@ -5,8 +5,6 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
 
 var index = require('./routes/index');
 var users = require('./routes/users');
@@ -14,6 +12,8 @@ var home = require('./routes/home');
 
 var app = express();
 
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -38,6 +38,23 @@ app.use(session({
 app.use('/', index);
 app.use('/home', home);
 app.use('/users', users);
+
+//POUR LE CHAT
+io.on('connection', function(socket){
+  console.log('a user connected');
+  socket.on('chat message', function(msg){
+    console.log('message: ' + msg);
+  });
+  socket.on('disconnect', function(){
+    console.log('user disconnected');
+  });
+});
+
+http.listen(3003, function(){
+  console.log('listening on *:3003');
+});
+
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
