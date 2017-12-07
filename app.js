@@ -39,18 +39,38 @@ app.use('/', index);
 app.use('/home', home);
 app.use('/users', users);
 
+
+nicknames = [];
 //POUR LE CHAT
 io.on('connection', function(socket){
   console.log('a user connected');
 
   socket.on('chat message', function(msg){
-	  socket.emit('new message', msg);
-	  	socket.broadcast.emit('new message', msg);
+	  	io.sockets.emit('new message', {msg: msg, nick: socket.nickname});
     console.log('message: ' + msg);
   });
 
+  socket.on('new user', function(data, callback){
+    if(nicknames.indexOf(data) != -1){
+        callback(false);
+    }
+    else {
+      callback(true);
+      socket.nickname = data;
+      nicknames.push(socket.nickname);
+      updateNicknames();
+    }
+  });
+
+  function updateNicknames(){
+    io.sockets.emit('usernames', nicknames);
+  }
+
   socket.on('disconnect', function(){
     console.log('user disconnected');
+    if (!socket.nickname) return;
+    nicknames.splice(nicknames.indexOf(socket.nickname), 1);
+    updateNicknames();
   });
 });
 
