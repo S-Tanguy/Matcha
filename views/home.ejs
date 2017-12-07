@@ -35,19 +35,13 @@
 		</div>
   		<% }); %>
 	</div>
+	<div class="amis">
+		<p>toto</p>
+		<p>kneth</p>
+	</div>
 
 
 
-
-
-  <div id="nickWrap">
-    <p>Enter a username</p>
-    <p id="nickError" ></p>
-    <form id="setNick">
-        <input size="35" id="nickname">
-        <input type="submit">
-    </form>
-  </div>
   <div id="contentWrap">
     <div id="chatWrap">
       <div class="messagerie">
@@ -57,6 +51,7 @@
         </form>
       </div>
       <div id="users"></div>
+	  <div id="chat"></div>
     </div>
   </div>
 
@@ -73,41 +68,94 @@
   <script type="text/javascript">
   $(document).ready(function(){
 
+	//  $(".friends").click(function() {
+  	// 	alert('bite');
+  	// });
+
   $(function () {
     var socket = io.connect('http://localhost:3003');
+	var user_name = <%- JSON.stringify(title) %>;
+	var destinat;
 
-    $('#setNick').submit(function(e){
-      e.preventDefault();
-      socket.emit('new user', $('#nickname').val(), function(data){
+    //$('#setNick').submit(function(e){
+     // e.preventDefault();
+      socket.emit('new user', user_name, function(data){
          if (data) {
-           $('#nickWrap').hide();
+         //  $('#nickWrap').hide();
            $('#contentWrap').show();
          }
          else {
            $('#nickError').html('That username is already taken ! try again.');
          }
       });
-      $('#nickname').val('');
-    });
+     // $('#nickname').val('');
+    //});
 
     socket.on('usernames', function(data){
       var html = '';
       for(i = 0;i < data.length; i++){
-        html += data[i] + '<br/>';
+        html += "<p class='friends'>" + data[i] + "</p><br/>";
       }
       $('#users').html(html);
+	  $(".friends").click(function() {
+		let desti = $(this)[0].innerText;
+		destinat = $(this)[0].innertText;
+
+
+		let header = document.createElement('div');
+		let form = document.createElement('form');
+		let input = document.createElement('input');
+		input.setAttribute("type", "text");
+		header.innerHTML += desti;
+		 let button = document.createElement('button');
+		 button.setAttribute("type", "submit");
+		 button.setAttribute("value", "send message");
+		 form.appendChild(input);
+		 form.appendChild(button);
+		 form.setAttribute("class", "form_mp");
+		 button.append("Send");
+  	 	 let chat = document.createElement('div');
+		 chat.setAttribute("id", "chat");
+		 chat = document.getElementById("chat");
+		 //chat.style.backgroundColor = "white";
+		 //chat.style.height = "300px";
+		 //chat.style.width = "300px";
+		 chat.style.border = "1px solid black";
+		chat.appendChild(header);
+		chat.appendChild(form);
+  	});
     });
 
-    $('#mess').submit(function(){
-      socket.emit('chat message', $('#m').val());
-      //$('#messages').append($('<li>').text($('#m').val()))
-      $('#m').val('');
+    // $('#mess').submit(function(){
+    //   socket.emit('chat message', $('#m').val(), function(data){
+	// 	  $('#messages').append("<span class='error'><li>" + data + "</li></span>");
+	//   });
+    //   //$('#messages').append($('<li>').text($('#m').val()))
+    //   $('#m').val('');
+    //   return false;
+    // });
+
+	$('.form_mp').submit(function(){
+      socket.emit('chat message', destinat, function(data){
+		  $('#messages').append("<span class='error'><li>" + data + "</li></span>");
+	  });
+     // $('#messages').append($('<li>').text($('#m').val()))
+      //$('#m').val('');
       return false;
     });
 
+
+
 	socket.on('new message', function(data) {
-		$('#messages').append("<li>" + data.nick  + ": " + data.msg + "</li>");
+		$('#messages').append("<span class='msg'><li>" + data.nick  + ": " + data.msg + "</li></span>");
 	});
+
+	socket.on('whisper', function(data) {
+		$('#messages').append("<span class='whisper'><li>" + data.nick  + ": " + data.msg + "</li></span>");
+	});
+
+
+
 
   });
 

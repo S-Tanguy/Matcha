@@ -10,6 +10,7 @@
 	display: inline-block;
 }
 
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
       body { font: 13px Helvetica, Arial; }
       #mess { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
@@ -18,3 +19,32 @@
       #messages { list-style-type: none; margin: 0; padding: 0; }
       #messages li { padding: 5px 10px; }
       #messages li:nth-child(odd) { background: #eee; }
+
+.error {
+	color: red;
+}
+
+.whisper {
+	color: gray;
+	font-style: italic;
+}
+
+.amis {
+	color: red;
+}
+
+.friends {
+	font-style: italic;
+}
+
+.chat_wid {
+	width:200px;
+	height:400px;
+	float:right;
+	border:1px solid black;
+}
+
+.header_wid {
+	height: 50px;
+	border: 1px solid black;
+}

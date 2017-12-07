@@ -40,41 +40,66 @@ app.use('/home', home);
 app.use('/users', users);
 
 
-nicknames = [];
+users = {};
 //POUR LE CHAT
 io.on('connection', function(socket){
+
   console.log('a user connected');
 
-  socket.on('chat message', function(msg){
+  socket.on('chat message', function(data, callback){
+	  var msg = data.trim();
+	  if (msg.substr(0, 3) === '/w '){
+		  msg = msg.substr(3);
+		  var ind = msg.indexOf(' ');
+
+		  if (ind !== -1)
+		  {
+			  var name = msg.substring(0, ind);
+			  var msg = msg.substring(ind + 1);
+			  if (name in users){
+				  users[name].emit('whisper', {msg: msg, nick: socket.nickname});
+				  console.log('Whisper!');
+			  }
+			  else {
+				  callback('Error ! Enter a valide User');
+			  }
+	  	  }
+		  else {
+			  callback('Error! please enter a message for your whisper!');
+	  	  }
+	  } else {
 	  	io.sockets.emit('new message', {msg: msg, nick: socket.nickname});
     console.log('message: ' + msg);
+		}
   });
 
   socket.on('new user', function(data, callback){
-    if(nicknames.indexOf(data) != -1){
+    if(data in users){
         callback(false);
     }
     else {
       callback(true);
       socket.nickname = data;
-      nicknames.push(socket.nickname);
+	  users[socket.nickname] = socket;
       updateNicknames();
     }
   });
 
   function updateNicknames(){
-    io.sockets.emit('usernames', nicknames);
+    io.sockets.emit('usernames', Object.keys(users));
   }
 
   socket.on('disconnect', function(){
+	nicknames = "";
     console.log('user disconnected');
     if (!socket.nickname) return;
-    nicknames.splice(nicknames.indexOf(socket.nickname), 1);
+	delete users[socket.nickname];
+	if (nicknames)
+    	nicknames.splice(nicknames.indexOf(socket.nickname), 1);
     updateNicknames();
-  });
 });
 
-
+});
 
 
 
