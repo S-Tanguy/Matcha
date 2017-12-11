@@ -42,18 +42,9 @@
 
 
 
-  <div id="contentWrap">
-    <div id="chatWrap">
-      <div class="messagerie">
-        <ul id="messages"></ul>
-        <form id="mess" action="">
-          <input type="text" name="msg" id="m" autocomplete="off" /><button id="but">Send</button>
-        </form>
-      </div>
+
       <div id="users"></div>
-	  <div id="chat"></div>
-    </div>
-  </div>
+	  <div id="allchat"></div>
 
 
 
@@ -75,7 +66,6 @@
   $(function () {
     var socket = io.connect('http://localhost:3003');
 	var user_name = <%- JSON.stringify(title) %>;
-	var destinat;
 
     //$('#setNick').submit(function(e){
      // e.preventDefault();
@@ -94,35 +84,61 @@
     socket.on('usernames', function(data){
       var html = '';
       for(i = 0;i < data.length; i++){
-        html += "<p class='friends'>" + data[i] + "</p><br/>";
+		  if (data[i] != user_name)
+        	html += "<p class='friends'>" + data[i] + "</p><br/>";
       }
       $('#users').html(html);
 	  $(".friends").click(function() {
 		let desti = $(this)[0].innerText;
-		destinat = $(this)[0].innertText;
+		if(document.getElementById(desti) == null)
+		{
+			let input = document.createElement('input');
+			input.setAttribute("type", "text");
 
+			let button = document.createElement('button');
+			button.setAttribute("type", "submit");
+			button.setAttribute("value", "send message");
+			button.append("Send");
 
-		let header = document.createElement('div');
-		let form = document.createElement('form');
-		let input = document.createElement('input');
-		input.setAttribute("type", "text");
-		header.innerHTML += desti;
-		 let button = document.createElement('button');
-		 button.setAttribute("type", "submit");
-		 button.setAttribute("value", "send message");
-		 form.appendChild(input);
-		 form.appendChild(button);
-		 form.setAttribute("class", "form_mp");
-		 button.append("Send");
-  	 	 let chat = document.createElement('div');
-		 chat.setAttribute("id", "chat");
-		 chat = document.getElementById("chat");
-		 //chat.style.backgroundColor = "white";
-		 //chat.style.height = "300px";
-		 //chat.style.width = "300px";
-		 chat.style.border = "1px solid black";
-		chat.appendChild(header);
-		chat.appendChild(form);
+			let form = document.createElement('form');
+			form.setAttribute("class", "form_mp");
+			form.setAttribute("id", desti);
+			form.appendChild(input);
+			form.appendChild(button);
+
+			let conv = document.createElement('div');
+
+			let header = document.createElement('div');
+			header.innerHTML += desti;
+
+			let chat = document.createElement('div');
+			chat.setAttribute("id", desti);
+			chat.appendChild(header);
+			chat.appendChild(conv);
+			chat.appendChild(form);
+
+			let allchat = document.getElementById("allchat");
+			 //chat.style.backgroundColor = "white";
+			 //chat.style.height = "300px";
+			 //chat.style.width = "300px";
+			allchat.style.border = "1px solid black";
+			allchat.appendChild(chat);
+			socket.emit('charge old messages', {desti: desti, autor: <%- JSON.stringify(title) %>}, function(data){
+
+			});
+			socket.on('append old messages', async function(data){
+				alert(data.msg);
+		    });
+			//}
+			$('#' + desti).submit(function(){
+				socket.emit('chat message', {desti: desti, msg: $(':input', '#' + desti).val()}, function(data){
+					$('#messages').append("<span class='error'><li>" + data + "</li></span>");
+				});
+				$('#' + desti).append($('<li>').text(<%- JSON.stringify(title) %> + ': ' + $(':input', '#' + desti).val()))
+				$(':input', '#' + desti).val('');
+				return false;
+			});
+		}
   	});
     });
 
@@ -135,23 +151,61 @@
     //   return false;
     // });
 
-	$('.form_mp').submit(function(){
-      socket.emit('chat message', destinat, function(data){
-		  $('#messages').append("<span class='error'><li>" + data + "</li></span>");
-	  });
-     // $('#messages').append($('<li>').text($('#m').val()))
-      //$('#m').val('');
-      return false;
-    });
 
 
 
-	socket.on('new message', function(data) {
+	/*socket.on('new message', function(data) {
 		$('#messages').append("<span class='msg'><li>" + data.nick  + ": " + data.msg + "</li></span>");
-	});
+	});*/
 
 	socket.on('whisper', function(data) {
-		$('#messages').append("<span class='whisper'><li>" + data.nick  + ": " + data.msg + "</li></span>");
+		// console.log(document.getElementById(data.nick));
+		if(document.getElementById(data.nick) == null)
+		{
+			let desti = data.nick;
+
+			let input = document.createElement('input');
+			input.setAttribute("type", "text");
+
+			let button = document.createElement('button');
+			button.setAttribute("type", "submit");
+			button.setAttribute("value", "send message");
+			button.append("Send");
+
+			let form = document.createElement('form');
+			form.setAttribute("class", "form_mp");//
+			form.setAttribute("id", data.nick);
+			form.appendChild(input);
+			form.appendChild(button);
+
+			let conv = document.createElement('div');
+
+			let header = document.createElement('div');
+			header.innerHTML += desti;
+
+			let chat = document.createElement('div');
+			chat.setAttribute("id", desti);
+			chat.appendChild(header);
+			chat.appendChild(conv);
+			chat.appendChild(form);
+
+			let allchat = document.getElementById("allchat");
+			 //chat.style.backgroundColor = "white";
+			 //chat.style.height = "300px";
+			 //chat.style.width = "300px";
+			allchat.style.border = "1px solid black";
+			allchat.appendChild(chat);
+			$('#' + data.nick).submit(function(){
+				socket.emit('chat message', {desti: desti, msg: $(':input', '#' + data.nick).val()}, function(data){
+					$('#messages').append("<span class='error'><li>" + data + "</li></span>");
+				});
+				$('#' + data.nick).append($('<li>').text(<%- JSON.stringify(title) %> + ': ' + $(':input', '#' + data.nick).val()))
+				$(':input', '#' + data.nick).val('');
+				return false;
+			});
+		}
+		$('#' + data.nick).append("<span class='whisper'><li>" + data.nick  + ": " + data.msg + "</li></span>");
+
 	});
 
 
@@ -167,11 +221,18 @@
 
 });
   </script>
+
+
+
+
+
+
 	<script type="text/javascript">
-	$('#filtres_bouton').click(function () {
+	$('.form_filtres').submit(function () {
 			$.ajax({
 			  type: 'post',
 			  data: JSON.stringify({
+
 					}),
 			  contentType: 'application/json; charset=utf-8',
 			  url: 'testajax',
@@ -180,6 +241,9 @@
 			//.val('')
 			//.removeAttr('checked')
 			//.removeAttr('selected');
+			$(':input', '.form_filtres').not(':button, :submit, :reset, :hidden')
+			.val('');
+			return false;
 		});
 	</script>
   </body>

@@ -5,6 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
+var mongo = require('mongodb');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
@@ -41,13 +42,34 @@ app.use('/users', users);
 
 
 users = {};
+var url = 'mongodb://localhost:27017/db_matcha';
 //POUR LE CHAT
 io.on('connection', function(socket){
 
   console.log('a user connected');
 
-  socket.on('chat message', function(data, callback){
-	  var msg = data.trim();
+
+
+  socket.on('chat message', async function(data, callback){
+	  console.log(data.desti + "ICI");
+	  console.log(data.msg);
+	  //console.log(user[name]);
+	  //if (name in users){
+	  	var conv = [data.desti, socket.nickname];
+		conv.sort();
+		var conversation = "" + conv[0] + "_" + conv[1] + "";
+
+		await mongo.connect(url, async function(err, db) {
+			await db.collection('chat').update({conversation: conversation}, {$push: {messages: {autor: socket.nickname, msg: data.msg}}}, {upsert: true});
+			console.log('dialogue enregistré');
+		});
+			console.log(conv[0] + ' bite');
+			console.log(conv[1] + ' bite');
+		  users[data.desti].emit('whisper', {msg: data.msg, nick: socket.nickname, div_chat: data.desti});
+
+		  console.log('Whisper!');
+	 // }
+	 /* //var msg = data.trim();
 	  if (msg.substr(0, 3) === '/w '){
 		  msg = msg.substr(3);
 		  var ind = msg.indexOf(' ');
@@ -70,8 +92,21 @@ io.on('connection', function(socket){
 	  } else {
 	  	io.sockets.emit('new message', {msg: msg, nick: socket.nickname});
     console.log('message: ' + msg);
-		}
+}*/
   });
+
+  socket.on('charge old messages', async function(data, callback){
+	  var conv = [data.desti, data.autor];
+	  conv.sort();
+	  var conversation = "" + conv[0] + "_" + conv[1] + "";
+	  await mongo.connect(url, async function(err, db) {
+		  var elem = await db.collection('chat').find({conversation: conversation}).toArray();
+		  socket.emit('append old messages', JSON.stringify({elem: elem}), function(){
+		  });
+		});
+  });
+
+
 
   socket.on('new user', function(data, callback){
     if(data in users){
