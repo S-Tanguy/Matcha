@@ -109,6 +109,11 @@ router.get('/', async function(req, res, next) {
 	}
 });
 
+router.post('/filtre_suggestion', function(req, res, next) {
+	 
+		res.render('home', {title: req.session.user, users: null, toto: "bite"});
+});
+
 router.get('/profil', function(req, res, next) {
 	if (!req.session.user) {
 		res.redirect('/');

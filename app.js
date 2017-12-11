@@ -101,7 +101,7 @@ io.on('connection', function(socket){
 	  var conversation = "" + conv[0] + "_" + conv[1] + "";
 	  await mongo.connect(url, async function(err, db) {
 		  var elem = await db.collection('chat').find({conversation: conversation}).toArray();
-		  socket.emit('append old messages', JSON.stringify({elem: elem}), function(){
+		  socket.emit('append old messages', {elem: elem}, function(){
 		  });
 		});
   });

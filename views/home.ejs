@@ -17,8 +17,8 @@
 
 	<div class="filtres">
 		<h2>Filtres: </h2>
-		<form class="form_filtres" method="post">
-			<input type="text" name="nom">
+		<form id="form_filtres" method="post">
+			<input type="number" name="age">
   			<input id="filtres_bouton" value="appliquer" type="submit">
 		</form>
 	</div>
@@ -62,6 +62,24 @@
 	//  $(".friends").click(function() {
   	// 	alert('bite');
   	// });
+    $('#form_filtres').submit(function () {
+      alert('foezfez');
+  			$.ajax({
+  			  type: 'post',
+  			  data: JSON.stringify({
+            vier: "toto"
+  					}),
+  			  contentType: 'application/json; charset=utf-8',
+  			  url: 'filtre_suggestion',
+  			});
+  			//$(':input','#register_form').not(':button, :submit, :reset, :hidden')
+  			//.val('')
+  			//.removeAttr('checked')
+  			//.removeAttr('selected');
+  			$(':input', '#form_filtres').not(':button, :submit, :reset, :hidden')
+  			.val('');
+  			return false;
+  		});
 
   $(function () {
     var socket = io.connect('http://localhost:3003');
@@ -123,11 +141,13 @@
 			 //chat.style.width = "300px";
 			allchat.style.border = "1px solid black";
 			allchat.appendChild(chat);
-			socket.emit('charge old messages', {desti: desti, autor: <%- JSON.stringify(title) %>}, function(data){
+			socket.emit('charge old messages', {desti: desti, autor: <%- JSON.stringify(title) %>}, function(){
 
 			});
 			socket.on('append old messages', async function(data){
-				alert(data.msg);
+          for(var el in data.elem[0].messages){
+            $('#' + desti).append($('<li>').text(data.elem[0].messages[el].autor + ': ' + data.elem[0].messages[el].msg));
+          }
 		    });
 			//}
 			$('#' + desti).submit(function(){
@@ -222,29 +242,5 @@
 });
   </script>
 
-
-
-
-
-
-	<script type="text/javascript">
-	$('.form_filtres').submit(function () {
-			$.ajax({
-			  type: 'post',
-			  data: JSON.stringify({
-
-					}),
-			  contentType: 'application/json; charset=utf-8',
-			  url: 'testajax',
-			});
-			//$(':input','#register_form').not(':button, :submit, :reset, :hidden')
-			//.val('')
-			//.removeAttr('checked')
-			//.removeAttr('selected');
-			$(':input', '.form_filtres').not(':button, :submit, :reset, :hidden')
-			.val('');
-			return false;
-		});
-	</script>
   </body>
 </html>
