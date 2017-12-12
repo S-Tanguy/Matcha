@@ -15,31 +15,41 @@ router.get('/', async function(req, res, next) {
 		let users;
 		if (req.session.sex == "homme" && req.session.orientation == "hetero")
 		{
-			users = await db.collection('users').find({login: {$ne: req.session.user}, sex: 'femme', orientation: {$ne: 'hommo'}, loc: {
-																																	$nearSphere: {
-     																																	$geometry: {
-        																																	type : "Point",
-        																																	coordinates : [ req.session.longitude, req.session.latitude ]
-     																																	},
-     																																$minDistance: 0,
-     																																$maxDistance: 100000
-  																																	}
-																																}
-																															});
+			users = await db.collection('users').find({
+				login: {
+					$ne: req.session.user
+				}, sex: 'femme', orientation: {
+					$ne: 'hommo'
+				}, loc: {
+							$nearSphere: {
+ 								$geometry: {
+    							type : "Point",
+    							coordinates : [ req.session.longitude, req.session.latitude ]
+ 								},
+ 								$minDistance: 0,
+ 								$maxDistance: 100000
+							}
+						}
+			});
 		}
 		else if (req.session.sex == "homme" && req.session.orientation == "hommo")
 		{
-			users = await db.collection('users').find({login: {$ne: req.session.user}, sex: 'homme', orientation: {$ne: 'hetero'}, loc: {
-			  																														$nearSphere: {
-			     																														$geometry: {
-			        																														type : "Point",
-			        																														coordinates : [ req.session.longitude, req.session.latitude ]
-			     																														},
-			     																														$minDistance: 0,
-			     																														$maxDistance: 100000
-			  																														}
-																																}
-																															});
+			users = await db.collection('users').find({
+				login: {
+					$ne: req.session.user
+				}, sex: 'homme', orientation: {
+					$ne: 'hetero'
+				}, loc: {
+					  	$nearSphere: {
+					     	$geometry: {
+					        type : "Point",
+					        coordinates : [ req.session.longitude, req.session.latitude ]
+					     	},
+					     	$minDistance: 0,
+					     	$maxDistance: 100000
+					  	}
+						}
+			});
 		}
 		else if (req.session.sex == "homme" && req.session.orientation == "bi")
 		{
@@ -109,10 +119,42 @@ router.get('/', async function(req, res, next) {
 	}
 });
 
-router.post('/filtre_suggestion', function(req, res, next) {
-	 
-		res.render('home', {title: req.session.user, users: null, toto: "bite"});
+
+
+
+
+
+
+
+
+
+router.post('/filtres', async function(req, res, next) {
+	let db = await mongo.connect(url);
+	console.log(req.body.age_min);
+	console.log(req.body.age_max);
+	console.log(req.body.userss);
+	users = await db.collection('users').find({login: { $ne: req.session.user}, age: {$gt: req.body.age_min, $lt: req.body.age_max}});
+	let array = [];
+	users.forEach(function(doc, err) {
+		array.push(doc);
+	}, function() {
+		console.log(array);
+		res.end(JSON.stringify(array));
+	});
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 router.get('/profil', function(req, res, next) {
 	if (!req.session.user) {

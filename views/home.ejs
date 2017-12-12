@@ -18,7 +18,8 @@
 	<div class="filtres">
 		<h2>Filtres: </h2>
 		<form id="form_filtres" method="post">
-			<input type="number" name="age">
+			<input type="number" name="age_min">
+      <input type="number" name="age_max">
   			<input id="filtres_bouton" value="appliquer" type="submit">
 		</form>
 	</div>
@@ -64,20 +65,25 @@
   	// });
     $('#form_filtres').submit(function () {
       alert('foezfez');
+      var userss = <% users %>
   			$.ajax({
-  			  type: 'post',
+  			  type: 'POST',
   			  data: JSON.stringify({
-            vier: "toto"
+            userss: userss,
+            age_min: $('#form_filtres input[name=age_min]').val(),
+            age_max: $('#form_filtres input[name=age_max]').val()
   					}),
   			  contentType: 'application/json; charset=utf-8',
-  			  url: 'filtre_suggestion',
-  			});
+  			  url: '/home/filtres',
+  			}).done (function (data) {
+          alert(data);
+        });
   			//$(':input','#register_form').not(':button, :submit, :reset, :hidden')
   			//.val('')
   			//.removeAttr('checked')
   			//.removeAttr('selected');
-  			$(':input', '#form_filtres').not(':button, :submit, :reset, :hidden')
-  			.val('');
+  			// $(':input', '#form_filtres').not(':button, :submit, :reset, :hidden')
+  			// .val('');
   			return false;
   		});
 
