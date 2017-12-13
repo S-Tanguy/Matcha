@@ -49,25 +49,20 @@
 
 
 
-
-
-
-
-
-
 <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js"></script>
   <script src="http://localhost:3003/socket.io/socket.io.js"></script>
   <script type="text/javascript">
   $(document).ready(function(){
 
-	//  $(".friends").click(function() {
-  	// 	alert('bite');
-  	// });
+	  $(".friends").click(function() {
+  		alert('bite');
+  	 });
     $('#form_filtres').submit(function () {
       alert('foezfez');
-      var userss = <% users %>
+      var userss = <%- JSON.stringify(users) %>
   			$.ajax({
   			  type: 'POST',
+          dataType: 'json',
   			  data: JSON.stringify({
             userss: userss,
             age_min: $('#form_filtres input[name=age_min]').val(),
@@ -76,12 +71,22 @@
   			  contentType: 'application/json; charset=utf-8',
   			  url: '/home/filtres',
   			}).done (function (data) {
-          alert(data);
+          $('.user_suggestion').remove();
+          data.forEach(function(user){
+            let div = document.createElement('div');
+            div.setAttribute("class", "user_suggestion");
+            //div.append("<p>" + user.nom + " - " + user.prenom + " - " + user.login +" <br> Age : " + user.age + "</p> <h3>" + user.sex + " - " + user.orientation + "</h3> <a href=users/"+user.login+">Go profil</a>");
+          //  div.html  ("<h3>FLUTE</h3>")
+          let test = `
+          <div class="user_suggestion"><p> ${user.nom} -  ${user.prenom} - ${user.login} <br> Age : ${user.age} </p>
+          <h3> ${user.sex} - ${user.orientation} </h3> <a href=users/${user.login}>Go profil</a></div>
+
+          `;
+            $('.suggestions').append(test);
+            console.log(user);
+          });
+          console.log(data);
         });
-  			//$(':input','#register_form').not(':button, :submit, :reset, :hidden')
-  			//.val('')
-  			//.removeAttr('checked')
-  			//.removeAttr('selected');
   			// $(':input', '#form_filtres').not(':button, :submit, :reset, :hidden')
   			// .val('');
   			return false;

@@ -129,18 +129,19 @@ router.get('/', async function(req, res, next) {
 
 
 router.post('/filtres', async function(req, res, next) {
-	let db = await mongo.connect(url);
+	//let db = await mongo.connect(url);
+	let array = [];
+	//console.log(req.body.userss + "//////////////////");
+	req.body.userss.forEach(function(doc, err){
+		if (doc.age >= req.body.age_min && doc.age <= req.body.age_max)
+		{
+			array.push(doc);
+		}
+	});
 	console.log(req.body.age_min);
 	console.log(req.body.age_max);
-	console.log(req.body.userss);
-	users = await db.collection('users').find({login: { $ne: req.session.user}, age: {$gt: req.body.age_min, $lt: req.body.age_max}});
-	let array = [];
-	users.forEach(function(doc, err) {
-		array.push(doc);
-	}, function() {
-		console.log(array);
-		res.end(JSON.stringify(array));
-	});
+	console.log(array);
+	res.end(JSON.stringify(array));
 });
 
 
