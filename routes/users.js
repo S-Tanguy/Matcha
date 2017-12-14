@@ -26,16 +26,22 @@ router.post('/like', function(req, res, next) {
 	mongo.connect(url, async function(err, db){
 		await db.collection('users').update(
    			{ login: req.session.user },
-   				{ $push: { like: req.body.user} }
+   				{ $addToSet: { like: req.body.user} }
 			);
 		console.log(req.session.user);
 		console.log(req.body.user);
 		await db.collection('users').update(
 			{ login: req.body.user },
-				{ $push: { liker: req.session.user} }
+				{ $addToSet: { liker: req.session.user} }
 		);
 			console.log(req.session.user);
 			console.log(req.body.user);
+	});
+});
+
+router.post('/add_view_profil', function(req, res, next) {
+	mongo.connect(url, async function(err, db){
+		console.log("JE SUIS DANS ADD VIEW PROFIL")
 	});
 });
 

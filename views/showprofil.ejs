@@ -47,6 +47,17 @@
 			  });
 		  }
 
+			$.ajax({
+				type: 'post',
+				data: JSON.stringify({
+					user: <%-JSON.stringify(user.login)%>
+				}),
+				contentType: 'application/json; charset=utf-8',
+				url: 'add_view_profil',
+			});
+
+
+
 		  $('#like_button').click(function () {
 	              $.ajax({
 	                type: 'post',
