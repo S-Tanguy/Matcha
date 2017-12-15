@@ -18,8 +18,10 @@
 	<div class="filtres">
 		<h2>Filtres: </h2>
 		<form id="form_filtres" method="post">
-			<input type="number" name="age_min">
-      <input type="number" name="age_max">
+			<input type="number" name="age_min" value="18">
+      <input type="number" name="age_max" value="85">
+      <input type="number" name="score_min" value="200">
+      <input type="number" name="score_max" value="1000">
   			<input id="filtres_bouton" value="appliquer" type="submit">
 		</form>
 	</div>
@@ -66,7 +68,9 @@
   			  data: JSON.stringify({
             userss: userss,
             age_min: $('#form_filtres input[name=age_min]').val(),
-            age_max: $('#form_filtres input[name=age_max]').val()
+            age_max: $('#form_filtres input[name=age_max]').val(),
+            score_min: $('#form_filtres input[name=score_min]').val(),
+            score_max: $('#form_filtres input[name=score_max]').val()
   					}),
   			  contentType: 'application/json; charset=utf-8',
   			  url: '/home/filtres',

@@ -27,6 +27,9 @@
 		<div class="like">
 			<a id="like_button" href="" >Je like <%= user.login %></a>
 		</div>
+		<div class="blok">
+			<a id="blok_button" href="" >Je blok <%= user.login %></a>
+		</div>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCYV5V1wefNwQQ_5ukp4SLtcqmrUh2Kp48"></script>
 		<script type="text/javascript">
@@ -59,15 +62,26 @@
 
 
 		  $('#like_button').click(function () {
-	              $.ajax({
-	                type: 'post',
-	                data: JSON.stringify({
+				$.ajax({
+	      	type: 'post',
+	        data: JSON.stringify({
 						user: <%-JSON.stringify(user.login)%>
 					}),
-	                contentType: 'application/json; charset=utf-8',
-	                url: 'like',
-	              });
-	          });
+	        contentType: 'application/json; charset=utf-8',
+	        url: 'like',
+	       });
+	     });
+
+			$('#blok_button').click(function () {
+				$.ajax({
+					type: 'post',
+				  data: JSON.stringify({
+						user: <%-JSON.stringify(user.login)%>
+					}),
+				  contentType: 'application/json; charset=utf-8',
+				  url: 'blok',
+				});
+			});
 		</script>
 	</body>
 </html>

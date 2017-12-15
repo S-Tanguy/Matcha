@@ -28,6 +28,12 @@ router.post('/like', function(req, res, next) {
    			{ login: req.session.user },
    				{ $addToSet: { like: req.body.user} }
 			);
+    await db.collection('users').update({
+      login: req.body.user, liker: { $nin: [req.session.user]}
+      }, {
+      $inc: { score: +3 }
+      }
+		);
 		console.log(req.session.user);
 		console.log(req.body.user);
 		await db.collection('users').update(
@@ -39,9 +45,29 @@ router.post('/like', function(req, res, next) {
 	});
 });
 
+router.post('/blok', function(req, res, next){
+  console.log('bite');
+  mongo.connect(url, async function(err, db){
+    await db.collection('users').update({
+      login: req.session.user
+    }, { $addToSet: { blok_users: req.body.user } }
+  );
+  });
+});
+
 router.post('/add_view_profil', function(req, res, next) {
 	mongo.connect(url, async function(err, db){
-		console.log("JE SUIS DANS ADD VIEW PROFIL")
+		console.log("JE SUIS DANS ADD VIEW PROFIL");
+    await db.collection('users').update({
+      login: req.body.user, viewer_profil: { $nin: [req.session.user]}
+      }, {
+      $inc: { score: +1 }
+      }
+		);
+     await db.collection('users').update(
+		 	{ login: req.body.user },
+		 		{ $addToSet: { viewer_profil: req.session.user } }
+		 );
 	});
 });
 

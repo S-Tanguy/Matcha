@@ -83,7 +83,8 @@ router.post('/testajax', function(req, res, next) {
 					password: bcryptedPassword,
 					accept: req.body.accept,
 					like: [],
-					liker: []
+					liker: [],
+					score: 200
 
 					//interets: null,
 					//bio: null

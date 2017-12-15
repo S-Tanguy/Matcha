@@ -131,6 +131,7 @@ router.get('/', async function(req, res, next) {
 router.post('/filtres', async function(req, res, next) {
 	//let db = await mongo.connect(url);
 	let array = [];
+	console.log(req.body.age_min + "ICI");
 	//console.log(req.body.userss + "//////////////////");
 	req.body.userss.forEach(function(doc, err){
 		if (doc.age >= req.body.age_min && doc.age <= req.body.age_max)
