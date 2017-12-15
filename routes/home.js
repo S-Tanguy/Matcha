@@ -6,116 +6,77 @@ var multer = require('multer');
 
 var url = 'mongodb://localhost:27017/db_matcha';
 
+getUsers = async (req) => {
+	let db = await mongo.connect(url);
+	let loc = {
+				$nearSphere: {
+					$geometry: {
+						type : "Point",
+						coordinates : [ req.session.longitude, req.session.latitude ]
+					},
+					$minDistance: 0,
+					$maxDistance: 100000
+				}
+			};
+	if (req.session.sex == "homme" && req.session.orientation == "hetero")
+	{
+		return db.collection('users').find({
+			login: {
+				$ne: req.session.user
+			}, sex: 'femme', orientation: {
+				$ne: 'hommo'
+			}, loc: loc,
+			bloker_users: {
+				$nin: [req.session.user]
+			}
+		}).toArray();
+	}
+	else if (req.session.sex == "homme" && req.session.orientation == "hommo")
+	{
+		return db.collection('users').find({
+			login: {
+				$ne: req.session.user
+			}, sex: 'homme', orientation: {
+				$ne: 'hetero'
+			}, loc: loc
+		}).toArray();
+	}
+	else if (req.session.sex == "homme" && req.session.orientation == "bi")
+	{
+		return db.collection('users').find( {login: {$ne: req.session.user}, $or: [ { sex: 'homme', orientation: { $ne: 'hetero' } }, { sex: 'femme', orientation: { $ne: 'hommo' } } ], loc: loc
+																																															}).toArray();
+	}
+	else if (req.session.sex == "femme" && req.session.orientation == "hetero")
+	{
+		return db.collection('users').find({login: {$ne: req.session.user}, sex: 'homme', orientation: {$ne: 'hommo'}, loc: loc
+																														}).toArray();
+	}
+	else if (req.session.sex == "femme" && req.session.orientation == "hommo")
+	{
+		return db.collection('users').find({login: {$ne: req.session.user}, sex: 'femme', orientation: {$ne: 'hetero'}, loc: loc
+																															}).toArray();
+	}
+	else if (req.session.sex == "femme" && req.session.orientation == "bi")
+	{
+		return db.collection('users').find( {login: {$ne: req.session.user},  $or: [ { sex: 'femme', orientation: { $ne: 'hetero' } }, { sex: 'homme', orientation: { $ne: 'hommo' } } ], loc: loc
+																																														 }).toArray();
+	}
+	else {
+		return new Error('Problem!');
+	}
+}
 
 router.get('/', async function(req, res, next) {
 	if (!req.session.user) {
 		res.redirect('/');
 	} else {
-		let db = await mongo.connect(url);
-		let users;
-		if (req.session.sex == "homme" && req.session.orientation == "hetero")
-		{
-			users = await db.collection('users').find({
-				login: {
-					$ne: req.session.user
-				}, sex: 'femme', orientation: {
-					$ne: 'hommo'
-				}, loc: {
-							$nearSphere: {
- 								$geometry: {
-    							type : "Point",
-    							coordinates : [ req.session.longitude, req.session.latitude ]
- 								},
- 								$minDistance: 0,
- 								$maxDistance: 100000
-							}
-						}
-			});
+		let users = [];
+		try {
+			users = await getUsers(req);
+		} catch (e) {
+			console.log(e);
 		}
-		else if (req.session.sex == "homme" && req.session.orientation == "hommo")
-		{
-			users = await db.collection('users').find({
-				login: {
-					$ne: req.session.user
-				}, sex: 'homme', orientation: {
-					$ne: 'hetero'
-				}, loc: {
-					  	$nearSphere: {
-					     	$geometry: {
-					        type : "Point",
-					        coordinates : [ req.session.longitude, req.session.latitude ]
-					     	},
-					     	$minDistance: 0,
-					     	$maxDistance: 100000
-					  	}
-						}
-			});
-		}
-		else if (req.session.sex == "homme" && req.session.orientation == "bi")
-		{
-			users = await db.collection('users').find( {login: {$ne: req.session.user}, $or: [ { sex: 'homme', orientation: { $ne: 'hetero' } }, { sex: 'femme', orientation: { $ne: 'hommo' } } ], loc: {
-			  																																															$nearSphere: {
-			     																																															$geometry: {
-			        																																															type : "Point",
-			        																																															coordinates : [ req.session.longitude, req.session.latitude ]
-			     																																															},
-			     																																															$minDistance: 0,
-			     																																															$maxDistance: 100000
-			  																																															}
-																																																	}
-																																																});
-		}
-		else if (req.session.sex == "femme" && req.session.orientation == "hetero")
-		{
-			users = await db.collection('users').find({login: {$ne: req.session.user}, sex: 'homme', orientation: {$ne: 'hommo'}, loc: {
-			  																														$nearSphere: {
-			     																														$geometry: {
-			        																														type : "Point",
-			        																														coordinates : [ req.session.longitude, req.session.latitude ]
-			     																														},
-			     																														$minDistance: 0,
-			     																														$maxDistance: 100000
-			  																														}
-																																}
-																															});
-		}
-		else if (req.session.sex == "femme" && req.session.orientation == "hommo")
-		{
-			users = await db.collection('users').find({login: {$ne: req.session.user}, sex: 'femme', orientation: {$ne: 'hetero'}, loc: {
-			  																															$nearSphere: {
-			     																															$geometry: {
-			        																															type : "Point",
-			        																															coordinates : [ req.session.longitude, req.session.latitude ]
-			     																															},
-			     																															$minDistance: 0,
-			     																															$maxDistance: 100000
-			  																															}
-																																	}
-																																});
-		}
-		else if (req.session.sex == "femme" && req.session.orientation == "bi")
-		{
-			users = await db.collection('users').find( {login: {$ne: req.session.user},  $or: [ { sex: 'femme', orientation: { $ne: 'hetero' } }, { sex: 'homme', orientation: { $ne: 'hommo' } } ], loc: {
-  																																																		$nearSphere: {
-     																																																		$geometry: {
-        																																																		type : "Point",
-        																																																		coordinates : [ req.session.longitude, req.session.latitude ]
-     																																																		},
-     																																																		$minDistance: 0,
-     																																																		$maxDistance: 100000
-  																																																		}
-																																																	}
-																																																 });
-		}
-		else {
-			console.log("PROBLEME DANS LA PROPOSITION DE LA SUGGESTION");
-		}
-		let array = [];
-		users.forEach(function(doc, err) {
-			array.push(doc);
-		}, function() {
-			res.render('home', { title: req.session.user, users: array, toto: "bite"});
-		})
+		res.render('home', { title: req.session.user, users: users, toto: "bite"});
 	}
 });
 
@@ -198,9 +159,15 @@ var storage = multer.diskStorage({
 
 var upload = multer({ storage: storage }).single('file');
 
+splitInterets = async (str) => {
+	return str.replace(/\s\s+/g, ' ').split(" ");
+}
+
+
+
 router.post('/edit_profil', upload,function(req, res, next) {
 	if (req.session.user) {
-			mongo.connect(url, function(err, db){
+			mongo.connect(url, async function(err, db){
 				console.log('ici');
 				console.log(req.session.user);
 				if (req.body.nom != "" && req.body.nom  != null)
@@ -247,9 +214,12 @@ router.post('/edit_profil', upload,function(req, res, next) {
 				}
 				if (req.body.interets != "" && req.body.interets != null)
 				{
+					let array = [];
+					array = await splitInterets(req.body.interets);
+					console.log(array);
 					db.collection('users').updateOne(
 	 			      { login: req.session.user },
-	 			      { $set: { interets: req.body.interets }
+	 			      { $addToSet: { interets: {$each: array }}
 				  });
 				}
 				if (req.body.photos != "")

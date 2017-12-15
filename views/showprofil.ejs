@@ -6,34 +6,39 @@
 		<title>Profil user</title>
 	</head>
 	<body>
-		<h2>Profil of <%= user.login %></h2>
-		<div class=".information_user">
-			<p>Nom: <%= user.nom %></p>
-			<p>Prenom: <%= user.prenom %></p>
-			<p>Email: <%= user.email %></p>
-			<p>Sex: <%= user.sex %></p>
-			<p>Age: <%= user.age %> ans</p>
-			<p>Orientation sexuelle: <%= user.orientation %></p>
-			<p>Interets: <%= user.interets %></p>
-			<p>Description: <%= user.bio %></p>
-		</div>
-		<% if (user.accept == 1) { %>
-		<div id="map" style="width:400px;height:400px">My map will go here</div>
+		<%if (blok_user == false) {%>
+			<h2>Profil of <%= user.login %></h2>
+			<div class=".information_user">
+				<p>Nom: <%= user.nom %></p>
+				<p>Prenom: <%= user.prenom %></p>
+				<p>Email: <%= user.email %></p>
+				<p>Sex: <%= user.sex %></p>
+				<p>Age: <%= user.age %> ans</p>
+				<p>Orientation sexuelle: <%= user.orientation %></p>
+				<p>Interets: <%= user.interets %></p>
+				<p>Description: <%= user.bio %></p>
+			</div>
+			<% if (user.accept == 1) { %>
+			<div id="map" style="width:400px;height:400px">My map will go here</div>
+			<% } else {%>
+			<div class="">
+				 <p><%= user.login %>, ne souhaite pas afficher sa localisation</p>
+			</div>
+			<% } %>
+			<div class="like">
+				<a id="like_button" href="" >Je like <%= user.login %></a>
+			</div>
+			<div class="blok">
+				<a id="blok_button" href="" >Je blok <%= user.login %></a>
+			</div>
 		<% } else {%>
-		<div class="">
-			 <p><%= user.login %>, ne souhaite pas afficher sa localisation</p>
-		</div>
+			<h2>Profil of <%= user.login %></h2>
+			<p><%= user.login %> est blok, si vous voulez acceder a ses informations il faut le deblok <a id="unblok_button" href="" >Je deblok <%= user.login %></a></p>
 		<% } %>
-		<div class="like">
-			<a id="like_button" href="" >Je like <%= user.login %></a>
-		</div>
-		<div class="blok">
-			<a id="blok_button" href="" >Je blok <%= user.login %></a>
-		</div>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCYV5V1wefNwQQ_5ukp4SLtcqmrUh2Kp48"></script>
 		<script type="text/javascript">
-		if (<%= user.accept %>){
+		if (<%= user.accept %> && <%= blok_user %> == false){
 		initMap();
 		}
 		function initMap() {
@@ -80,6 +85,22 @@
 					}),
 				  contentType: 'application/json; charset=utf-8',
 				  url: 'blok',
+				});
+			});
+
+			$('#unblok_button').click(function () {
+				$.ajax({
+					type: 'post',
+				  data: JSON.stringify({
+						user: <%-JSON.stringify(user.login)%>
+					}),
+				  contentType: 'application/json; charset=utf-8',
+				  url: 'unblok',
+				}).done(function(data){
+					if (data.res == 'ok')
+					{
+						location.reload();
+					}
 				});
 			});
 		</script>

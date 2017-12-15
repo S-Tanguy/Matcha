@@ -6,20 +6,37 @@ var url = 'mongodb://localhost:27017/db_matcha';
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
+  if (req.session.user){
+    res.send('respond with a resource');
+  }
+  else {
+    res.redirect('/');
+  }
 });
 
 router.get('/:login', function(req, res, next) {
-	mongo.connect(url, function(err, db) {
-		db.collection('users').findOne({login: req.params.login}, function(error, Userfound) {
-			if (err){
-				console.log("Pb with the search of the profil");
-			}
-			else {
-			res.render('showprofil', {user: Userfound});
-			}
-		});
-	});
+  if (req.session.user){
+  	mongo.connect(url, function(err, db) {
+  		db.collection('users').findOne({login: req.params.login}, async function(error, Userfound) {
+        await db.collection('users').findOne({login: req.session.user, blok_users: [req.params.login]}, async function (error, result){
+          if (result){
+      			if (err){
+      				console.log("Pb with the search of the profil");
+      			}
+      			else {
+      			res.render('showprofil', {user: Userfound, blok_user: true});
+      			}
+          }
+          else {
+            res.render('showprofil', {user: Userfound, blok_user: false})
+          }
+        });
+  		});
+  	});
+  }
+  else {
+    res.redirect('/');
+  }
 });
 
 router.post('/like', function(req, res, next) {
@@ -48,10 +65,61 @@ router.post('/like', function(req, res, next) {
 router.post('/blok', function(req, res, next){
   console.log('bite');
   mongo.connect(url, async function(err, db){
+    await db.collection('users').findOne({login: req.body.user, bloker_users_history: [req.session.user]}, async function (error, result){
+        await db.collection('users').update({
+          login: req.session.user
+          }, {
+            $addToSet: {
+              blok_users: req.body.user
+            }
+          }
+        );
+        await db.collection('users').update({
+          login: req.body.user
+        }, {
+          $addToSet: {
+            bloker_users_history: req.session.user
+          }
+        }
+      );
+      await db.collection('users').update({
+        login: req.body.user
+      }, {
+        $addToSet: {
+          bloker_users: req.session.user
+        }
+      }
+    );
+      if (!result)
+      {
+      await db.collection('users').update({
+        login: req.body.user
+        }, {
+          $inc: {
+            score: -5
+          }
+        }
+      );
+      }
+    });
+  });
+});
+
+router.post('/unblok', function(req, res, next){
+  console.log('bite');
+  mongo.connect(url, async function(err, db){
     await db.collection('users').update({
       login: req.session.user
-    }, { $addToSet: { blok_users: req.body.user } }
-  );
+      }, {
+      $pull: { blok_users: req.body.user}
+      }
+    );
+    await db.collection('users').update({
+      login: req.body.user
+      }, {
+      $pull: { bloker_users: req.session.user}
+      }
+    );
   });
 });
 
