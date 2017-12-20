@@ -28,7 +28,12 @@ router.get('/:login', function(req, res, next) {
       			}
           }
           else {
-            res.render('showprofil', {user: Userfound, blok_user: false})
+            await db.collection('users').findOne({login: req.session.user, like: [req.params.login]}, async function (err, is_in_like){
+              if (is_in_like)
+                res.render('showprofil', {user: Userfound, blok_user: false, is_like: true})
+              else
+                res.render('showprofil', {user: Userfound, blok_user: false, is_like: false})
+            });
           }
         });
   		});
@@ -59,6 +64,25 @@ router.post('/like', function(req, res, next) {
 		);
 			console.log(req.session.user);
 			console.log(req.body.user);
+	});
+});
+
+router.post('/dislike', function(req, res, next) {
+	mongo.connect(url, async function(err, db){
+		await db.collection('users').update(
+   			{ login: req.session.user },
+   				{ $pull: { like: req.body.user} }
+			);
+      await db.collection('users').update({
+        login: req.body.user, liker: { $in: [req.session.user]}
+        }, {
+        $inc: { score: -3 }
+        }
+  		);
+      await db.collection('users').update(
+  			{ login: req.body.user },
+  				{ $pull: { liker: req.session.user} }
+  		);
 	});
 });
 
@@ -124,19 +148,21 @@ router.post('/unblok', function(req, res, next){
 });
 
 router.post('/add_view_profil', function(req, res, next) {
-	mongo.connect(url, async function(err, db){
-		console.log("JE SUIS DANS ADD VIEW PROFIL");
-    await db.collection('users').update({
-      login: req.body.user, viewer_profil: { $nin: [req.session.user]}
-      }, {
-      $inc: { score: +1 }
-      }
-		);
-     await db.collection('users').update(
-		 	{ login: req.body.user },
-		 		{ $addToSet: { viewer_profil: req.session.user } }
-		 );
-	});
+  if (req.body.user != req.session.user ) {
+  	mongo.connect(url, async function(err, db){
+  		console.log("JE SUIS DANS ADD VIEW PROFIL");
+      await db.collection('users').update({
+        login: req.body.user, viewer_profil: { $nin: [req.session.user]}
+        }, {
+        $inc: { score: +1 }
+        }
+  		);
+       await db.collection('users').update(
+  		 	{ login: req.body.user },
+  		 		{ $addToSet: { viewer_profil: req.session.user } }
+  		 );
+  	});
+  }
 });
 
 module.exports = router;

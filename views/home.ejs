@@ -18,11 +18,25 @@
 	<div class="filtres">
 		<h2>Filtres: </h2>
 		<form id="form_filtres" method="post">
-			<input type="number" name="age_min" value="18">
-      <input type="number" name="age_max" value="85">
-      <input type="number" name="score_min" value="200">
-      <input type="number" name="score_max" value="1000">
-  			<input id="filtres_bouton" value="appliquer" type="submit">
+      <p>Age :
+			    <input type="number" name="age_min" value="18">
+          <input type="number" name="age_max" value="85">
+      </p>
+      <br>
+      <p>Scores popularity :
+          <input type="number" name="score_min" value="200">
+          <input type="number" name="score_max" value="1000">
+      </p>
+      <br>
+      <p>Interets :
+          <input type="text" name="interets" placeholder="ex: #velo #fromage">
+      </p>
+      <br>
+      <p>Adresse :
+        <input id="user_input_autocomplete_address" name="adresse" placeholder="Start typing your address...">
+      </p>
+      <br>
+        <input id="filtres_bouton" value="appliquer" type="submit">
 		</form>
 	</div>
 	<div class="suggestions">
@@ -38,6 +52,16 @@
 		</div>
   		<% }); %>
 	</div>
+  <%if (viewers) { %>
+    <p>10 last viewers !</p>
+    <div class="viewer_of_my_profil">
+      <% for(var i=0 ;i < 10 ;i++) { %>
+        <p><%= viewers[i] %></p>
+      <% } %>
+    </div>
+  <% } %>
+  <br> <br>
+  <p>Users connected</p>
 	<div class="amis">
 		<p>toto</p>
 		<p>kneth</p>
@@ -49,10 +73,57 @@
       <div id="users"></div>
 	  <div id="allchat"></div>
 
-
-
 <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js"></script>
+
   <script src="http://localhost:3003/socket.io/socket.io.js"></script>
+  <script type="text/javascript"
+    src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyCYV5V1wefNwQQ_5ukp4SLtcqmrUh2Kp48">
+  </script>
+
+
+
+
+
+<!-- pour add l'input avec l'autocomplete -->
+  <script type="text/javascript">
+  function initializeAutocomplete(id) {
+var element = document.getElementById(id);
+if (element) {
+  var autocomplete = new google.maps.places.Autocomplete(element, { types: ['geocode'] });
+  google.maps.event.addListener(autocomplete, 'place_changed', onPlaceChanged);
+}
+}
+
+function onPlaceChanged() {
+  var place = this.getPlace();
+
+  // console.log(place);  // Uncomment this line to view the full object returned by Google API.
+
+  for (var i in place.address_components) {
+    var component = place.address_components[i];
+    for (var j in component.types) {  // Some types are ["country", "political"]
+      var type_element = document.getElementById(component.types[j]);
+      if (type_element) {
+        type_element.value = component.long_name;
+      }
+    }
+  }
+}
+
+google.maps.event.addDomListener(window, 'load', function() {
+  initializeAutocomplete('user_input_autocomplete_address');
+});
+
+
+
+
+
+
+
+
+
+
+  </script>
   <script type="text/javascript">
   $(document).ready(function(){
 
@@ -60,7 +131,6 @@
   		alert('bite');
   	 });
     $('#form_filtres').submit(function () {
-      alert('foezfez');
       var userss = <%- JSON.stringify(users) %>
   			$.ajax({
   			  type: 'POST',
@@ -70,7 +140,9 @@
             age_min: $('#form_filtres input[name=age_min]').val(),
             age_max: $('#form_filtres input[name=age_max]').val(),
             score_min: $('#form_filtres input[name=score_min]').val(),
-            score_max: $('#form_filtres input[name=score_max]').val()
+            score_max: $('#form_filtres input[name=score_max]').val(),
+            interets: $('#form_filtres input[name=interets]').val(),
+            adresse: $('#form_filtres input[name=adresse]').val()
   					}),
   			  contentType: 'application/json; charset=utf-8',
   			  url: '/home/filtres',

@@ -31,6 +31,9 @@
 
 .amis {
 	color: red;
+	display: inline-block;
+	border: 1px solid black;
+	padding: 3px;
 }
 
 .friends {
@@ -47,4 +50,15 @@
 .header_wid {
 	height: 50px;
 	border: 1px solid black;
+}
+
+.viewer_of_my_profil {
+	border: 1px solid black;
+	margin-top: 5px;
+	display: inline-block;
+	padding: 3px;
+}
+
+#user_input_autocomplete_address {
+	width: 400px;
 }

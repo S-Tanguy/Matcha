@@ -2,17 +2,36 @@ var express = require('express');
 var router = express.Router();
 var mongo = require('mongodb');
 var assert = require('assert');
+var _ = require('underscore');
 var multer = require('multer');
+var NodeGeocoder = require('node-geocoder');
 
 var url = 'mongodb://localhost:27017/db_matcha';
 
-getUsers = async (req) => {
+var options = {
+  provider: 'google',
+
+  // Optional depending on the providers
+  httpAdapter: 'https', // Default
+  apiKey: 'AIzaSyCYV5V1wefNwQQ_5ukp4SLtcqmrUh2Kp48', // for Mapquest, OpenCage, Google Premier
+  formatter: null         // 'gpx', 'string', ...
+};
+
+var geocoder = NodeGeocoder(options);
+
+
+
+getUsers = async (req, longi, lati) => {
+	if (longi == 'nothing' && lati == 'nothing'){
+		longi = req.session.longitude;
+		lati = req.session.latitude;
+	}
 	let db = await mongo.connect(url);
 	let loc = {
 				$nearSphere: {
 					$geometry: {
 						type : "Point",
-						coordinates : [ req.session.longitude, req.session.latitude ]
+						coordinates : [ longi, lati ]
 					},
 					$minDistance: 0,
 					$maxDistance: 100000
@@ -66,24 +85,124 @@ getUsers = async (req) => {
 	}
 }
 
+getViewers = async (req) => {
+let db = await mongo.connect(url);
+var viewers = await db.collection('users').find(
+	{
+		login: req.session.user,
+	},
+	{
+			viewer_profil: 1
+	}
+).toArray();
+return(viewers[0].viewer_profil);
+}
+
+
+
 router.get('/', async function(req, res, next) {
 	if (!req.session.user) {
 		res.redirect('/');
 	} else {
 		let users = [];
 		try {
-			users = await getUsers(req);
+			viewers = await getViewers(req);
+			users = await getUsers(req, 'nothing', 'nothing');
 		} catch (e) {
 			console.log(e);
 		}
-		res.render('home', { title: req.session.user, users: users, toto: "bite"});
+		res.render('home', { title: req.session.user, users: users, viewers: viewers, toto: "bite"});
 	}
 });
 
 
 
 
+getPointsCommuns = async (arr1, arr2) => {
+	let nb = 0;
+	let taille1 = arr1.length;
+	let taille2 = arr2.length;
+	for (var i = 0; i < taille1; i++){
+		for (var j = 0; j < taille2; j++){
+			if (arr1[i] == arr2[j])
+			{
+				nb++;
+			}
+		}
+	}
+	return(nb);
+}
 
+
+/*tri = async (tab) => {
+	let array = [];
+	let taille = tab.length;
+
+	for (var i = 0; i < taille - 1; i++)
+	{
+		let toto = 0;
+		if (tab[i].nb < tab[i + 1].nb)
+		{
+			var b = tab[i];
+			tab[i] = tab[i + 1];
+			tab[i + 1] = b;
+		}
+	}
+	return(tab);
+}*/
+
+
+giveTab = async (req, users, array, array_of_interets, tab) => {
+	users.forEach(async function(doc, err){
+		if (doc.age >= req.body.age_min && doc.age <= req.body.age_max)
+		{
+			if (req.body.interets){
+				if (array && doc.interets)
+				{
+					points_en_communs = await getPointsCommuns(array_of_interets, doc.interets);
+				}
+				else
+					points_en_communs = 0;
+				var new_obj = {nb: points_en_communs, login: doc.login};
+				tab.push(new_obj);
+			}
+			array.push(doc);
+		}
+	});
+  return ({array: array, tab: tab});
+}
+
+
+getCoordsOfAdresse = async (adresse) => {
+	geocoder.geocode(adresse, function(err, res) {
+		if (res){
+			console.log('dans le res');
+			return ({longitude: res.longitude, latitude:	 res.latitude});
+		}
+		else {
+			console.log('pas dans le res');
+			return ({longitude: 'nothing', latitude: 'nothing'});
+		}
+	});
+	console.log('nul part');
+	return ({longitude: 'nothing', latitude: 'nothing'});
+}
+
+getUsersAboutCoords = async (req) => {
+	let array_users = [];
+	if (req.body.adresse)
+	{
+		coord = await getCoordsOfAdresse(req.body.adresse);
+		array_users = await getUsers(req, coord.longitude, coord.latitude);
+		console.log(coord.longitude);
+		console.log('ICI')
+	}
+	else {
+		console.log('LA')
+		array_users = await getUsers(req, 'nothing', 'nothing');
+	}
+	return (array_users)
+}
 
 
 
@@ -92,17 +211,48 @@ router.get('/', async function(req, res, next) {
 router.post('/filtres', async function(req, res, next) {
 	//let db = await mongo.connect(url);
 	let array = [];
-	console.log(req.body.age_min + "ICI");
-	//console.log(req.body.userss + "//////////////////");
-	req.body.userss.forEach(function(doc, err){
-		if (doc.age >= req.body.age_min && doc.age <= req.body.age_max)
-		{
-			array.push(doc);
+	let points_en_communs = 0;
+	let count = 0;
+	let tab = [];
+	let array_of_interets = [];
+	let array_trie = [];
+	let array_users = [];
+	let longitude = 'nothing';
+	let latitude = 'nothing';
+
+	/*if (req.body.adresse)
+	{
+		coord = await getCoordsOfAdresse(req.body.adresse);
+		array_users = await getUsers(req, coord.longitude, coord.latitude);
+	}
+	else {
+		array_users = await getUsers(req, 'nothing', 'nothing');
+	}*/
+	array_users = await getUsersAboutCoords(req);
+
+	if (req.body.interets){
+		array_of_interets = await splitInterets(req.body.interets);
+		//array_users = await getUsers(req, 'nothing', 'nothing');
+		console.log(array_users);
+		result = await giveTab(req, array_users, array, array_of_interets, tab)
+
+		tab = result.tab;
+		var new_tab = _.sortBy(tab, 'nb').reverse();
+
+		while(new_tab.length != array_trie.length){
+			new_tab.forEach(function(doc, err){
+				array_users.forEach(function(res, err){
+					if (doc.login == res.login)
+						array_trie.push(res);
+				})
+			});
 		}
-	});
-	console.log(req.body.age_min);
-	console.log(req.body.age_max);
-	console.log(array);
+		array = null;
+		array = array_trie;
+	}
+	else {
+		array = array_users;
+	}
 	res.end(JSON.stringify(array));
 });
 

@@ -25,9 +25,15 @@
 				 <p><%= user.login %>, ne souhaite pas afficher sa localisation</p>
 			</div>
 			<% } %>
-			<div class="like">
-				<a id="like_button" href="" >Je like <%= user.login %></a>
-			</div>
+			<% if (is_like == false) {%>
+				<div class="like">
+					<a id="like_button" href="" >Je like <%= user.login %></a>
+				</div>
+			<% } else { %>
+				<div class="dislike">
+					<a id="dislike_button" href="" >Je dislike <%= user.login %></a>
+				</div>
+			<% } %>
 			<div class="blok">
 				<a id="blok_button" href="" >Je blok <%= user.login %></a>
 			</div>
@@ -76,6 +82,17 @@
 	        url: 'like',
 	       });
 	     });
+
+			 $('#dislike_button').click(function () {
+ 				$.ajax({
+ 	      	type: 'post',
+ 	        data: JSON.stringify({
+ 						user: <%-JSON.stringify(user.login)%>
+ 					}),
+ 	        contentType: 'application/json; charset=utf-8',
+ 	        url: 'dislike',
+ 	       });
+ 	     });
 
 			$('#blok_button').click(function () {
 				$.ajax({
