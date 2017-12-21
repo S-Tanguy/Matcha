@@ -19,9 +19,19 @@ var options = {
 
 var geocoder = NodeGeocoder(options);
 
-
+/*const getLongiLati = function(req, longi, lati) {
+  return new Promise(function(res, rej) {
+    if (longi == 'nothing' && lati == 'nothing')
+      return ({longitude: req.session.longitude, latitude: req.session.latitude});
+    else
+      return ({longitude: longi, latitude: lati});
+  })
+}*/
 
 getUsers = async (req, longi, lati) => {
+  console.log(longi)
+  console.log(lati)
+  console.log('YEAHHH')
 	if (longi == 'nothing' && lati == 'nothing'){
 		longi = req.session.longitude;
 		lati = req.session.latitude;
@@ -173,32 +183,33 @@ giveTab = async (req, users, array, array_of_interets, tab) => {
 }
 
 
-getCoordsOfAdresse = async (adresse) => {
-	geocoder.geocode(adresse, function(err, res) {
-		if (res){
-			console.log('dans le res');
-			return ({longitude: res.longitude, latitude:	 res.latitude});
-		}
-		else {
-			console.log('pas dans le res');
-			return ({longitude: 'nothing', latitude: 'nothing'});
-		}
-	});
-	console.log('nul part');
-	return ({longitude: 'nothing', latitude: 'nothing'});
+const getCoordsOfAdresse = function(adresse) {
+  return new Promise(function(res, rej) {
+    geocoder.geocode(adresse, function(err, result) {
+  		if (result){
+        console.log('IIIIIIIIIIIIIIIIIIIIICCCCCCCCCCCCCCCCCCCC');
+  			console.log('dans le result');
+  			res({longitude: result[0].longitude, latitude:	 result[0].latitude});
+  		}
+  		else {
+  			console.log('pas dans le result');
+  			res({longitude: 'nothing', latitude: 'nothing'});
+  		}
+  	});
+  })
 }
 
 getUsersAboutCoords = async (req) => {
 	let array_users = [];
 	if (req.body.adresse)
 	{
+    console.log('IL Y A UNE ADRESSE')
 		coord = await getCoordsOfAdresse(req.body.adresse);
+    console.log(coord);
 		array_users = await getUsers(req, coord.longitude, coord.latitude);
-		console.log(coord.longitude);
-		console.log('ICI')
 	}
 	else {
-		console.log('LA')
+		console.log('NON IL Y A PAS D ADRESSE')
 		array_users = await getUsers(req, 'nothing', 'nothing');
 	}
 	return (array_users)
@@ -217,17 +228,7 @@ router.post('/filtres', async function(req, res, next) {
 	let array_of_interets = [];
 	let array_trie = [];
 	let array_users = [];
-	let longitude = 'nothing';
-	let latitude = 'nothing';
 
-	/*if (req.body.adresse)
-	{
-		coord = await getCoordsOfAdresse(req.body.adresse);
-		array_users = await getUsers(req, coord.longitude, coord.latitude);
-	}
-	else {
-		array_users = await getUsers(req, 'nothing', 'nothing');
-	}*/
 	array_users = await getUsersAboutCoords(req);
 
 	if (req.body.interets){
@@ -237,11 +238,12 @@ router.post('/filtres', async function(req, res, next) {
 		result = await giveTab(req, array_users, array, array_of_interets, tab)
 
 		tab = result.tab;
+    array = result.array
 		var new_tab = _.sortBy(tab, 'nb').reverse();
 
 		while(new_tab.length != array_trie.length){
 			new_tab.forEach(function(doc, err){
-				array_users.forEach(function(res, err){
+				array.forEach(function(res, err){
 					if (doc.login == res.login)
 						array_trie.push(res);
 				})
@@ -251,7 +253,8 @@ router.post('/filtres', async function(req, res, next) {
 		array = array_trie;
 	}
 	else {
-		array = array_users;
+		userCorrespondAge = await giveTab(req, array_users, array, null, tab);
+    array = userCorrespondAge.array;
 	}
 	res.end(JSON.stringify(array));
 });
