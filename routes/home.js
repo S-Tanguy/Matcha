@@ -189,7 +189,10 @@ const getCoordsOfAdresse = function(adresse) {
   		if (result){
         console.log('IIIIIIIIIIIIIIIIIIIIICCCCCCCCCCCCCCCCCCCC');
   			console.log('dans le result');
-  			res({longitude: result[0].longitude, latitude:	 result[0].latitude});
+        if (result[0] == undefined)
+          res({longitude: 'nothing', latitude: 'nothing'});
+        else
+          res({longitude: result[0].longitude, latitude:	 result[0].latitude});
   		}
   		else {
   			console.log('pas dans le result');
