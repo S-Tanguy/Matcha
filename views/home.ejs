@@ -179,6 +179,7 @@ $(document).on({
   $(function () {
     var socket = io.connect('http://localhost:3003');
 	var user_name = <%- JSON.stringify(title) %>;
+  var friends = <%- JSON.stringify(friends) %>
 
     //$('#setNick').submit(function(e){
      // e.preventDefault();
@@ -197,8 +198,11 @@ $(document).on({
     socket.on('usernames', function(data){
       var html = '';
       for(i = 0;i < data.length; i++){
-		  if (data[i] != user_name)
-        	html += "<p class='friends'>" + data[i] + "</p><br/>";
+        for(j = 0;j < friends.length; j++)
+        {
+    		  if (data[i] != user_name && data[i] == friends[j].login)
+            	html += "<p class='friends'>" + data[i] + "</p><br/>";
+        }
       }
       $('#users').html(html);
 	  $(".friends").click(function() {

@@ -28,7 +28,7 @@ router.get('/:login', function(req, res, next) {
       			}
           }
           else {
-            await db.collection('users').findOne({login: req.session.user, like: [req.params.login]}, async function (err, is_in_like){
+            await db.collection('users').findOne({login: req.session.user, like: { $in : [req.params.login]}}, async function (err, is_in_like){
               if (is_in_like)
                 res.render('showprofil', {user: Userfound, blok_user: false, is_like: true})
               else

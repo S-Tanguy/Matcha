@@ -124,6 +124,8 @@ io.on('connection', function(socket){
     io.sockets.emit('usernames', Object.keys(users));
   }
 
+
+
   socket.on('disconnect', function(){
 	nicknames = "";
     console.log('user disconnected');

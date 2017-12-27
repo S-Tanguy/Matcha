@@ -108,7 +108,19 @@ var viewers = await db.collection('users').find(
 return(viewers[0].viewer_profil);
 }
 
-
+const getFriends = function(login) {
+return new Promise (function (res, rej){
+  var result = [];
+  mongo.connect(url, async function(err, db) {
+    var elem = await db.collection('users').find({like: login, liker: login}, {login: 1});
+    elem.forEach(function(doc, err){
+      result.push(doc);
+    }, function (){
+      res(result);
+    });
+  });
+});
+}
 
 router.get('/', async function(req, res, next) {
 	if (!req.session.user) {
@@ -121,7 +133,9 @@ router.get('/', async function(req, res, next) {
 		} catch (e) {
 			console.log(e);
 		}
-		res.render('home', { title: req.session.user, users: users, viewers: viewers, toto: "bite"});
+    var friends = await getFriends(req.session.user);
+    console.log(friends)
+		res.render('home', { title: req.session.user, users: users, viewers: viewers, friends: friends, toto: "bite"});
 	}
 });
 
