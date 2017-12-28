@@ -122,6 +122,20 @@ return new Promise (function (res, rej){
 });
 }
 
+const getNotifications = function(login) {
+return new Promise (function (res, rej){
+  var result = [];
+  mongo.connect(url, async function(err, db) {
+    var elem = await db.collection('users').find({login: login}, {notifications: 1});
+    elem.forEach(function(doc, err){
+      result.push(doc);
+    }, function (){
+      res(result);
+    });
+  });
+});
+}
+
 router.get('/', async function(req, res, next) {
 	if (!req.session.user) {
 		res.redirect('/');
@@ -134,8 +148,10 @@ router.get('/', async function(req, res, next) {
 			console.log(e);
 		}
     var friends = await getFriends(req.session.user);
-    console.log(friends)
-		res.render('home', { title: req.session.user, users: users, viewers: viewers, friends: friends, toto: "bite"});
+    var notifications = await getNotifications(req.session.user);
+    console.log(notifications);
+    console.log('ICI');
+		res.render('home', { title: req.session.user, users: users, viewers: viewers, friends: friends, notifications: notifications, toto: "bite"});
 	}
 });
 

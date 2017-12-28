@@ -48,6 +48,26 @@ io.on('connection', function(socket){
 
   console.log('a user connected');
 
+  socket.on('likeUser', async function(data){
+    console.log(data.user_like);
+    console.log(' ICIIIIIIIIIIIIIII');
+    await mongo.connect(url, async function(err, db) {
+			await db.collection('users').findOne({login: data.user_like, like: { $in: [data.like_autor]}}, async function(err, result){
+        if (result){
+          users[data.user_like].emit('someOneLikeYouInBack', data.like_autor);
+        }else {
+          users[data.user_like].emit('someOneLikeYou', data.like_autor);
+        }
+      });
+			console.log('dialogue enregistré');
+		});
+  });
+
+
+  socket.on('dislikeUser', async function(data){
+    users[data.user_dislike].emit('someOneDislikeYou', data.dislike_autor);
+  });
+
 
 
   socket.on('chat message', async function(data, callback){
@@ -59,7 +79,8 @@ io.on('connection', function(socket){
 		conv.sort();
 		var conversation = "" + conv[0] + "_" + conv[1] + "";
 
-		await mongo.connect(url, async function(err, db) {
+
+    await mongo.connect(url, async function(err, db) {
 			await db.collection('chat').update({conversation: conversation}, {$push: {messages: {autor: socket.nickname, msg: data.msg}}}, {upsert: true});
 			console.log('dialogue enregistré');
 		});

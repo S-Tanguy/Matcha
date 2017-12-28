@@ -43,10 +43,12 @@
 		<% } %>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCYV5V1wefNwQQ_5ukp4SLtcqmrUh2Kp48"></script>
+		<script src="http://localhost:3003/socket.io/socket.io.js"></script>
 		<script type="text/javascript">
 		if (<%= user.accept %> && <%= blok_user %> == false){
 		initMap();
 		}
+		var socket = io.connect('http://localhost:3003');
 		function initMap() {
   			var myLatLng = {lat: <%= user.latitude %>, lng: <%= user.longitude %>};
 			  var map = new google.maps.Map(document.getElementById('map'), {
@@ -76,22 +78,26 @@
 				$.ajax({
 	      	type: 'post',
 	        data: JSON.stringify({
-						user: <%-JSON.stringify(user.login)%>
+						user: <%-JSON.stringify(user.login)%>,
+						like_autor: <%-JSON.stringify(me)%>
 					}),
 	        contentType: 'application/json; charset=utf-8',
 	        url: 'like',
 	       });
+				 socket.emit('likeUser', {user_like: <%-JSON.stringify(user.login)%>, like_autor: <%-JSON.stringify(me)%>});
 	     });
 
 			 $('#dislike_button').click(function () {
  				$.ajax({
  	      	type: 'post',
  	        data: JSON.stringify({
- 						user: <%-JSON.stringify(user.login)%>
+ 						user: <%-JSON.stringify(user.login)%>,
+						dislike_autor: <%-JSON.stringify(me)%>
  					}),
  	        contentType: 'application/json; charset=utf-8',
  	        url: 'dislike',
  	       });
+				 socket.emit('dislikeUser', {user_dislike: <%-JSON.stringify(user.login)%>, dislike_autor: <%-JSON.stringify(me)%>});
  	     });
 
 			$('#blok_button').click(function () {

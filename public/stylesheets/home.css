@@ -1,13 +1,29 @@
 .suggestions {
 	border: 1px solid black;
-	width: 100%;
+	width: 80%;
 	height: 500px;
 	margin-top: 60px;
+	display: inline-block;
+	float: left
 }
 
 .user_suggestion {
 	border: 1px solid black;
 	display: inline-block;
+}
+
+.notifications {
+	margin-top: 60px;
+	display: inline-block;
+border: 1px solid black;
+width: 20%;
+height: 500px;
+float: left;
+overflow: auto;
+}
+
+.main {
+	border: 1px solid black;
 }
 
 

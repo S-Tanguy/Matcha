@@ -52,6 +52,15 @@
 		</div>
   		<% }); %>
 	</div>
+  <div class="notifications">
+    <h2>Notifications</h2>
+    <hr>
+    <% if (notifications) { %>
+    <% for(var i=0 ;i < notifications.length ;i++) { %>
+      <p><%- notifications[i].notifications%></p>
+    <% } %>
+    <% } %>
+  </div>
   <%if (viewers) { %>
     <p>10 last viewers !</p>
     <div class="viewer_of_my_profil">
@@ -194,6 +203,20 @@ $(document).on({
       });
      // $('#nickname').val('');
     //});
+    socket.on('someOneLikeYou', function(like_autor){
+      html = `<br><div class=notifSomeOneLikeYou> <p> ${like_autor} like you </p> </div><br><hr>`;
+      $('.notifications').append(html);
+    });
+
+    socket.on('someOneLikeYouInBack', function(like_autor){
+      html = `<br><div class=notifSomeOneLikeYouInBack> <p> ${like_autor} like you in back</p> </div><br><hr>`;
+      $('.notifications').append(html);
+    });
+
+    socket.on('someOneDislikeYou', function(dislike_autor){
+      html = `<br><div class=notifSomeOneLikeYouInBack> <p> ${dislike_autor} dislike you </p> </div><br><hr>`;
+      $('.notifications').append(html);
+    });
 
     socket.on('usernames', function(data){
       var html = '';

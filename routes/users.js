@@ -30,9 +30,9 @@ router.get('/:login', function(req, res, next) {
           else {
             await db.collection('users').findOne({login: req.session.user, like: { $in : [req.params.login]}}, async function (err, is_in_like){
               if (is_in_like)
-                res.render('showprofil', {user: Userfound, blok_user: false, is_like: true})
+                res.render('showprofil', {me: req.session.user, user: Userfound, blok_user: false, is_like: true})
               else
-                res.render('showprofil', {user: Userfound, blok_user: false, is_like: false})
+                res.render('showprofil', {me: req.session.user, user: Userfound, blok_user: false, is_like: false})
             });
           }
         });
@@ -62,8 +62,18 @@ router.post('/like', function(req, res, next) {
 			{ login: req.body.user },
 				{ $addToSet: { liker: req.session.user} }
 		);
-			console.log(req.session.user);
-			console.log(req.body.user);
+		console.log(req.session.user);
+		console.log(req.body.user);
+		await db.collection('users').findOne({login: req.body.user, like: { $in: [req.body.like_autor]}}, async function(err, result){
+      if (result){
+        html = `<br><div class=notifSomeOneLikeYouInBack> <p> ${req.body.like_autor} like you in back</p> </div><br><hr>`
+        await db.collection('users').updateOne({login: req.body.user}, {$push: {notifications: html}})
+      }else {
+        html = `<br><div class=notifSomeOneLikeYou> <p> ${req.body.like_autor} like you </p> </div><br><hr>`
+        await db.collection('users').updateOne({login: req.body.user}, {$push: {notifications: html}})
+      }
+    });
+			console.log('dialogue enregistré');
 	});
 });
 
@@ -83,6 +93,8 @@ router.post('/dislike', function(req, res, next) {
   			{ login: req.body.user },
   				{ $pull: { liker: req.session.user} }
   		);
+      html = `<br><div class=notifDislikeYou> <p> ${req.body.dislike_autor} dislike you </p> </div><br><hr>`
+      await db.collection('users').updateOne({login: req.body.user}, {$push: {notifications: html}})
 	});
 });
 
