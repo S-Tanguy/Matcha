@@ -65,8 +65,22 @@ io.on('connection', function(socket){
 
 
   socket.on('dislikeUser', async function(data){
-    users[data.user_dislike].emit('someOneDislikeYou', data.dislike_autor);
+    if (users[data.user_dislike]){
+      users[data.user_dislike].emit('someOneDislikeYou', data.dislike_autor);
+      await mongo.connect(url, async function(err, db) {
+        html = `<br><div class=notifDislikeYou> <p> ${data.dislike_autor} dislike you </p> </div><br><hr>`
+        await db.collection('users').updateOne({login: data.user_dislike}, {$push: {notifications: html}})
+  		});
+    }
   });
+
+  socket.on('visitProfil', async function(data){
+    await mongo.connect(url, async function(err, db) {
+      html = `<br><div class=notifVisitYou> <p> ${data.visit_autor} visit your profil </p> </div><br><hr>`
+      await db.collection('users').updateOne({login: data.user_profil}, {$push: {notifications: html}})
+    });
+    users[data.user_profil].emit('someOneVisitYourProfil', data.visit_autor);
+	});
 
 
 
@@ -83,10 +97,15 @@ io.on('connection', function(socket){
     await mongo.connect(url, async function(err, db) {
 			await db.collection('chat').update({conversation: conversation}, {$push: {messages: {autor: socket.nickname, msg: data.msg}}}, {upsert: true});
 			console.log('dialogue enregistré');
+      html = `<br><div class=notifSomeOneSendMessage> <p> ${socket.nickname} send you a new message </p> </div><br><hr>`
+      await db.collection('users').updateOne({login: data.desti}, {$push: {notifications: html}})
 		});
 			console.log(conv[0] + ' bite');
 			console.log(conv[1] + ' bite');
 		  users[data.desti].emit('whisper', {msg: data.msg, nick: socket.nickname, div_chat: data.desti});
+      users[data.desti].emit('notifNewMessage', socket.nickname);
+
+
 
 		  console.log('Whisper!');
 	 // }

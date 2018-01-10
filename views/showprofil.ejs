@@ -45,10 +45,15 @@
 		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCYV5V1wefNwQQ_5ukp4SLtcqmrUh2Kp48"></script>
 		<script src="http://localhost:3003/socket.io/socket.io.js"></script>
 		<script type="text/javascript">
+		var socket = io.connect('http://localhost:3003');
+
+		if (<%= blok_user %> == false)
+			socket.emit('visitProfil', {user_profil: <%-JSON.stringify(user.login)%>, visit_autor: <%-JSON.stringify(me)%>});
+
 		if (<%= user.accept %> && <%= blok_user %> == false){
 		initMap();
 		}
-		var socket = io.connect('http://localhost:3003');
+		
 		function initMap() {
   			var myLatLng = {lat: <%= user.latitude %>, lng: <%= user.longitude %>};
 			  var map = new google.maps.Map(document.getElementById('map'), {
@@ -110,6 +115,8 @@
 				  url: 'blok',
 				});
 			});
+
+
 
 			$('#unblok_button').click(function () {
 				$.ajax({

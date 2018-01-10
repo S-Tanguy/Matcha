@@ -24,7 +24,7 @@ router.get('/:login', function(req, res, next) {
       				console.log("Pb with the search of the profil");
       			}
       			else {
-      			res.render('showprofil', {user: Userfound, blok_user: true});
+      			res.render('showprofil', {user: Userfound, blok_user: true, me: req.session.user});
       			}
           }
           else {
@@ -93,8 +93,8 @@ router.post('/dislike', function(req, res, next) {
   			{ login: req.body.user },
   				{ $pull: { liker: req.session.user} }
   		);
-      html = `<br><div class=notifDislikeYou> <p> ${req.body.dislike_autor} dislike you </p> </div><br><hr>`
-      await db.collection('users').updateOne({login: req.body.user}, {$push: {notifications: html}})
+      //html = `<br><div class=notifDislikeYou> <p> ${req.body.dislike_autor} dislike you </p> </div><br><hr>`
+      //await db.collection('users').updateOne({login: req.body.user}, {$push: {notifications: html}})
 	});
 });
 

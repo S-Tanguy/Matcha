@@ -4,6 +4,8 @@ var mongo = require('mongodb');
 var assert = require('assert');
 var bcrypt = require('bcrypt');
 var request = require('request');
+var uniqid = require('uniqid');
+const nodemailer = require('nodemailer');
 
 var url = 'mongodb://localhost:27017/db_matcha';
 
@@ -14,6 +16,26 @@ router.get('/', function(req, res, next) {
     res.render('index', {
 	  login: req.session.user,
 	  error: error
+	});
+});
+
+router.get('/forget_password', function(req, res, next){
+  res.render('forget_password');
+});
+
+router.get('/reset_password', function(req, res, next){
+	mongo.connect(url, async function(err, db) {
+		var exist = await db.collection('users').find({email: req.query.email, cle: req.query.cle}).count();
+		if (!exist)
+		{
+			console.log(req.query.cle + '\n');
+			console.log(req.query.email + '\n')
+			console.log("LA CLE N'EST PAS VALIDE AVEC L'EMAIL");
+			res.redirect('/');
+		}
+		else {
+			res.render('reset_password', {email_hidden: req.query.email});
+		}
 	});
 });
 
@@ -57,6 +79,68 @@ const Age = function(birthday) {
   		res(new Number((new Date().getTime() - birthday.getTime()) / 31536000000).toFixed(0));
 	})
 }
+
+router.post('/forget_password', function(req, res, next){
+	console.log(req.body.email);
+	console.log('//////////////////////////////////////');
+	mongo.connect(url, async function(err, db) {
+		var exist = await db.collection('users').find({email: req.body.email}).count();
+		if (exist != 0){
+			console.log('L\'EMAIL EXIST');
+			var cle = uniqid();
+			await db.collection('users').updateOne({email: req.body.email}, { $set: { cle: cle } });
+			let transporter = nodemailer.createTransport({
+    		service: 'gmail',
+    		auth: {
+					user: 'matcha42424242@gmail.com',
+					pass: 'matcha42'
+				}
+			});
+			let mailOptions = {
+        from: 'matcha42424242@gmail.com', // sender address
+        to: req.body.email, // list of receivers
+        subject: 'Change password ✔', // Subject line
+        text: 'Please check this page for reset your password ! http://localhost:3000/reset_password?cle=' + cle + '&email=' +  req.body.email + '',
+    	};
+			transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            return console.log(error);
+        } else {
+        console.log('Message sent: %s', info.response);
+			}
+			});
+		}
+		else {
+			console.log('L\'EMAIL N\'EXIST PAS');
+		}
+	});
+});
+
+
+router.post('/reset_password', function(req, res, next){
+	if (req.body.password_one == req.body.password_two) {
+		mongo.connect(url, async function(err, db) {
+			bcrypt.hash(req.body.password_one, 5, async function(err, bcryptedPassword) {
+				db.collection('users').updateOne({email: req.body.email_hidden}, { $set: { password: bcryptedPassword } }, async function(err, result){
+					if (result){
+						console.log('OK BITE')
+					}
+					await db.collection('users').updateOne({email: req.body.email_hidden}, { $unset: { cle: '' } });
+				});
+			});
+			console.log("MDP IDENTIQUES");
+		});
+	}
+	else {
+		console.log("MDP DIFFERENTS");
+	}
+});
+
+
+
+
+
+
 
 router.post('/testajax', function(req, res, next) {
 	if (req.body.nom && req.body.prenom && req.body.login && req.body.email && req.body.password && req.body.password_conf

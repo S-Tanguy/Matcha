@@ -218,6 +218,16 @@ $(document).on({
       $('.notifications').append(html);
     });
 
+    socket.on('someOneVisitYourProfil', function(visit_autor){
+      html = `<br><div class=notifSomeOneVisitYou> <p> ${visit_autor} visit your profil </p> </div><br><hr>`;
+      $('.notifications').append(html);
+    });
+
+    socket.on('notifNewMessage', async function(autor_message){
+      html = `<br><div class=notifSomeOneSendMessage> <p> ${autor_message} send you a new message </p> </div><br><hr>`;
+      $('.notifications').append(html);
+    });
+
     socket.on('usernames', function(data){
       var html = '';
       for(i = 0;i < data.length; i++){
@@ -284,21 +294,8 @@ $(document).on({
   	});
     });
 
-    // $('#mess').submit(function(){
-    //   socket.emit('chat message', $('#m').val(), function(data){
-	// 	  $('#messages').append("<span class='error'><li>" + data + "</li></span>");
-	//   });
-    //   //$('#messages').append($('<li>').text($('#m').val()))
-    //   $('#m').val('');
-    //   return false;
-    // });
 
 
-
-
-	/*socket.on('new message', function(data) {
-		$('#messages').append("<span class='msg'><li>" + data.nick  + ": " + data.msg + "</li></span>");
-	});*/
 
 	socket.on('whisper', function(data) {
 		// console.log(document.getElementById(data.nick));
