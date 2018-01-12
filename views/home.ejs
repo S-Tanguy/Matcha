@@ -8,7 +8,7 @@
     <p>Welcome to <%= title %></p>
 	<a href="http://localhost:3000/home/profil">Go your profil	</a>
 	<div class="div_enter_data">
-		<form action="/deconnexion" method="post">
+		<form action="deconnexion" method="post">
 		    <div class="button">
 		        <button type="submit">Deconnexion</button>
 		    </div>
@@ -70,15 +70,16 @@
     </div>
   <% } %>
   <br> <br>
-  <p>Users connected</p>
+  <p>Friends</p>
 	<div class="amis">
-		<p>toto</p>
-		<p>kneth</p>
+    <% for(var i=0 ;i < friends.length ;i++) { %>
+      <p><%= friends[i].login %></p>
+    <% } %>
 	</div>
 
 
 
-
+      <p>Friends inline</p>
       <div id="users"></div>
 	  <div id="allchat"></div>
 <div class="modal"></div>
@@ -190,6 +191,7 @@ $(document).on({
 	var user_name = <%- JSON.stringify(title) %>;
   var friends = <%- JSON.stringify(friends) %>
 
+
     //$('#setNick').submit(function(e){
      // e.preventDefault();
       socket.emit('new user', user_name, function(data){
@@ -296,7 +298,6 @@ $(document).on({
 
 
 
-
 	socket.on('whisper', function(data) {
 		// console.log(document.getElementById(data.nick));
 		if(document.getElementById(data.nick) == null)
@@ -346,18 +347,7 @@ $(document).on({
 		$('#' + data.nick).append("<span class='whisper'><li>" + data.nick  + ": " + data.msg + "</li></span>");
 
 	});
-
-
-
-
   });
-
-
-
-
-
-
-
 });
   </script>
 

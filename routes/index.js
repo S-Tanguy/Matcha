@@ -118,7 +118,7 @@ router.post('/forget_password', function(req, res, next){
 
 
 router.post('/reset_password', function(req, res, next){
-	if (req.body.password_one == req.body.password_two) {
+	if (req.body.password_one == req.body.password_two && validPassword(req.body.password_one)) {
 		mongo.connect(url, async function(err, db) {
 			bcrypt.hash(req.body.password_one, 5, async function(err, bcryptedPassword) {
 				db.collection('users').updateOne({email: req.body.email_hidden}, { $set: { password: bcryptedPassword } }, async function(err, result){
@@ -132,83 +132,100 @@ router.post('/reset_password', function(req, res, next){
 		});
 	}
 	else {
-		console.log("MDP DIFFERENTS");
+		console.log("PROBLEME AVEC LES MOTS DE PASSE SOIT ILS SONT DIFFERENTS SOIT PAS AU BON FORMAT");
 	}
 });
 
 
+function validEmail(email) {
+    let regex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return regex.test(email);
+}
 
+function validPassword(pwd) {
+    let regex = /^\S*(?=\S{6,})(?=\S*[a-z])(?=\S*[A-Z])(?=\S*[\d])\S*$/;
+    return regex.test(pwd);
+}
 
-
-
+function validLogin(login) {
+    let regex = /^[a-z0-9]+$/i;
+    return regex.test(login);
+}
 
 router.post('/testajax', function(req, res, next) {
-	if (req.body.nom && req.body.prenom && req.body.login && req.body.email && req.body.password && req.body.password_conf
-		&& req.body.orientation && req.body.sex && req.body.date && (req.body.password == req.body.password_conf))
-	{
-		mongo.connect(url, async function(err, db) {
-			if (await db.collection('users').find().count() == 0) {
-				db.collection('users').createIndex( { loc : "2dsphere" } )
-				console.log('FDP');
-			}
-			assert.equal(null, err);
-			bcrypt.hash(req.body.password, 5, async function(err, bcryptedPassword) {
-				if (err) {
-					console.log("Pb avec le bcrypt");
+	if (validEmail(req.body.email) && validPassword(req.body.password) && validLogin(req.body.login)){
+		if (req.body.nom && req.body.prenom && req.body.login && req.body.email && req.body.password && req.body.password_conf
+			&& req.body.orientation && req.body.sex && req.body.date && (req.body.password == req.body.password_conf))
+		{
+			mongo.connect(url, async function(err, db) {
+				if (await db.collection('users').find().count() == 0) {
+					db.collection('users').createIndex( { loc : "2dsphere" } )
+					console.log('FDP');
 				}
-				var user = {
-					nom: req.body.nom,
-					prenom: req.body.prenom,
-					login: req.body.login,
-					email: req.body.email,
-					sex: req.body.sex,
-					orientation: req.body.orientation,
-					age: await Age(new Date(req.body.date)),
-					password: bcryptedPassword,
-					accept: req.body.accept,
-					like: [],
-					liker: [],
-					score: 200
+				assert.equal(null, err);
+				bcrypt.hash(req.body.password, 5, async function(err, bcryptedPassword) {
+					if (err) {
+						console.log("Pb avec le bcrypt");
+					}
+					var user = {
+						nom: req.body.nom,
+						prenom: req.body.prenom,
+						login: req.body.login,
+						email: req.body.email,
+						sex: req.body.sex,
+						orientation: req.body.orientation,
+						age: await Age(new Date(req.body.date)),
+						password: bcryptedPassword,
+						accept: req.body.accept,
+						like: [],
+						liker: [],
+						score: 200,
+						photos: []
 
-					//interets: null,
-					//bio: null
-				};
-				if (req.body.accept == 0){
-					let coord = await getLoc();
-					var loc = {
-						type: "Point",
-						coordinates: [coord.longitude, coord.latitude]
+						//interets: null,
+						//bio: null
+					};
+					if (req.body.accept == 0){
+						let coord = await getLoc();
+						var loc = {
+							type: "Point",
+							coordinates: [coord.longitude, coord.latitude]
+						}
+						console.log(coord);
+						user.loc = loc;
+						user.longitude = coord.longitude;
+						user.latitude = coord.latitude;
+						await db.collection('users').insertOne(user, function(err, result) {
+							assert.equal(null, err);
+							console.log("User add in db");
+							res.redirect('/');
+						});
 					}
-					console.log(coord);
-					user.loc = loc;
-					user.longitude = coord.longitude;
-					user.latitude = coord.latitude;
-					await db.collection('users').insertOne(user, function(err, result) {
-						assert.equal(null, err);
-						console.log("User add in db");
-						res.redirect('/');
-					});
-				}
-				else {
-					var loc = {
-						type: "Point",
-						coordinates: [req.body.longitude, req.body.latitude]
+					else {
+						var loc = {
+							type: "Point",
+							coordinates: [req.body.longitude, req.body.latitude]
+						}
+						user.loc = loc;
+						user.longitude = req.body.longitude;
+						user.latitude = req.body.latitude;
+						await db.collection('users').insertOne(user, function(err, result) {
+							assert.equal(null, err);
+							console.log("User add in db");
+							res.redirect('/');
+						});
+						db.close();
 					}
-					user.loc = loc;
-					user.longitude = req.body.longitude;
-					user.latitude = req.body.latitude;
-					await db.collection('users').insertOne(user, function(err, result) {
-						assert.equal(null, err);
-						console.log("User add in db");
-						res.redirect('/');
-					});
-					db.close();
-				}
+				});
 			});
-		});
-		//res.redirect('/');
+			//res.redirect('/');
+		}
 	}
-	//res.redirect('/');
+	else {
+		console.log("Problem with the format of password, email, or login")
+		res.redirect('/');
+	}
+		//res.redirect('/');
 
 });
 

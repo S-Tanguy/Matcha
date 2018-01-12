@@ -18,21 +18,36 @@ router.get('/:login', function(req, res, next) {
   if (req.session.user){
   	mongo.connect(url, function(err, db) {
   		db.collection('users').findOne({login: req.params.login}, async function(error, Userfound) {
-        await db.collection('users').findOne({login: req.session.user, blok_users: [req.params.login]}, async function (error, result){
+        let signal = await db.collection('users').findOne({login: req.session.user, user_signal: { $in: [req.params.login]}});
+        let mes_photos = await db.collection('users').findOne({login: req.session.user}, {photos: 1});
+        await db.collection('users').findOne({login: req.session.user, blok_users: { $in :[req.params.login]}}, async function (error, result){
           if (result){
       			if (err){
       				console.log("Pb with the search of the profil");
       			}
       			else {
-      			res.render('showprofil', {user: Userfound, blok_user: true, me: req.session.user});
-      			}
+              if (signal)
+      			     res.render('showprofil', {user: Userfound, blok_user: true, me: req.session.user, signal: true});
+              else
+                 res.render('showprofil', {user: Userfound, blok_user: true, me: req.session.user, signal: false});
+            }
           }
           else {
             await db.collection('users').findOne({login: req.session.user, like: { $in : [req.params.login]}}, async function (err, is_in_like){
-              if (is_in_like)
-                res.render('showprofil', {me: req.session.user, user: Userfound, blok_user: false, is_like: true})
-              else
-                res.render('showprofil', {me: req.session.user, user: Userfound, blok_user: false, is_like: false})
+              if (is_in_like){
+                if (signal){
+                  res.render('showprofil', {me: req.session.user, user: Userfound, blok_user: false, is_like: true, signal: true, mes_photos: mes_photos.photos})
+                }
+                else {
+                  res.render('showprofil', {me: req.session.user, user: Userfound, blok_user: false, is_like: true, signal: false, mes_photos: mes_photos.photos})
+                }
+              }
+              else{
+                if (signal)
+                  res.render('showprofil', {me: req.session.user, user: Userfound, blok_user: false, is_like: false, signal: true, mes_photos: mes_photos.photos})
+                else
+                  res.render('showprofil', {me: req.session.user, user: Userfound, blok_user: false, is_like: false, signal: false, mes_photos: mes_photos.photos})
+              }
             });
           }
         });
@@ -95,6 +110,26 @@ router.post('/dislike', function(req, res, next) {
   		);
       //html = `<br><div class=notifDislikeYou> <p> ${req.body.dislike_autor} dislike you </p> </div><br><hr>`
       //await db.collection('users').updateOne({login: req.body.user}, {$push: {notifications: html}})
+	});
+});
+
+router.post('/signal_button', function(req, res, next) {
+	mongo.connect(url, async function(err, db){
+    await db.collection('users').findOne({login: req.session.user, user_signal: [req.body.user]}, async function (error, result){
+      if (!result){
+        await db.collection('users').update(
+       			{ login: req.session.user },
+       				{ $push: { user_signal: req.body.user} }
+    			);
+          await db.collection('users').update({
+            login: req.body.user
+            }, {
+            $inc: { score: -2 }
+            }
+      		);
+          console.log('L\'utilisateur a ete signale');
+      }
+    });
 	});
 });
 

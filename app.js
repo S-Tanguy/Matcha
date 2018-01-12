@@ -27,7 +27,7 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '/public')));
 app.use(session({
   secret: 'fluteabec',
   resave: false,
@@ -54,8 +54,10 @@ io.on('connection', function(socket){
     await mongo.connect(url, async function(err, db) {
 			await db.collection('users').findOne({login: data.user_like, like: { $in: [data.like_autor]}}, async function(err, result){
         if (result){
+          if (users[data.user_like])
           users[data.user_like].emit('someOneLikeYouInBack', data.like_autor);
         }else {
+          if (users[data.user_like])
           users[data.user_like].emit('someOneLikeYou', data.like_autor);
         }
       });
@@ -79,6 +81,7 @@ io.on('connection', function(socket){
       html = `<br><div class=notifVisitYou> <p> ${data.visit_autor} visit your profil </p> </div><br><hr>`
       await db.collection('users').updateOne({login: data.user_profil}, {$push: {notifications: html}})
     });
+    if (users[data.user_profil])
     users[data.user_profil].emit('someOneVisitYourProfil', data.visit_autor);
 	});
 
@@ -102,9 +105,10 @@ io.on('connection', function(socket){
 		});
 			console.log(conv[0] + ' bite');
 			console.log(conv[1] + ' bite');
-		  users[data.desti].emit('whisper', {msg: data.msg, nick: socket.nickname, div_chat: data.desti});
-      users[data.desti].emit('notifNewMessage', socket.nickname);
-
+      if (users[data.desti]){
+		      users[data.desti].emit('whisper', {msg: data.msg, nick: socket.nickname, div_chat: data.desti});
+          users[data.desti].emit('notifNewMessage', socket.nickname);
+      }
 
 
 		  console.log('Whisper!');
@@ -178,17 +182,9 @@ io.on('connection', function(socket){
 
 });
 
-
-
-
-
-
-
 http.listen(3003, function(){
   console.log('listening on *:3003');
 });
-
-
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

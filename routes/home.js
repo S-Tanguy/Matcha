@@ -57,7 +57,9 @@ getUsers = async (req, longi, lati) => {
 			}, loc: loc,
 			bloker_users: {
 				$nin: [req.session.user]
-			}
+			}, age : {
+        $gt: '18'
+      }
 		}).toArray();
 	}
 	else if (req.session.sex == "homme" && req.session.orientation == "hommo")
@@ -67,27 +69,30 @@ getUsers = async (req, longi, lati) => {
 				$ne: req.session.user
 			}, sex: 'homme', orientation: {
 				$ne: 'hetero'
-			}, loc: loc
+			}, loc: loc,
+      age : {
+        $gt: '18'
+      }
 		}).toArray();
 	}
 	else if (req.session.sex == "homme" && req.session.orientation == "bi")
 	{
-		return db.collection('users').find( {login: {$ne: req.session.user}, $or: [ { sex: 'homme', orientation: { $ne: 'hetero' } }, { sex: 'femme', orientation: { $ne: 'hommo' } } ], loc: loc
+		return db.collection('users').find( {login: {$ne: req.session.user}, $or: [ { sex: 'homme', orientation: { $ne: 'hetero' } }, { sex: 'femme', orientation: { $ne: 'hommo' } } ], loc: loc, age: {$gt: '18'}
 																																															}).toArray();
 	}
 	else if (req.session.sex == "femme" && req.session.orientation == "hetero")
 	{
-		return db.collection('users').find({login: {$ne: req.session.user}, sex: 'homme', orientation: {$ne: 'hommo'}, loc: loc
+		return db.collection('users').find({login: {$ne: req.session.user}, sex: 'homme', orientation: {$ne: 'hommo'}, loc: loc, age: {$gt: '18'}
 																														}).toArray();
 	}
 	else if (req.session.sex == "femme" && req.session.orientation == "hommo")
 	{
-		return db.collection('users').find({login: {$ne: req.session.user}, sex: 'femme', orientation: {$ne: 'hetero'}, loc: loc
+		return db.collection('users').find({login: {$ne: req.session.user}, sex: 'femme', orientation: {$ne: 'hetero'}, loc: loc, age: {$gt: '18'}
 																															}).toArray();
 	}
 	else if (req.session.sex == "femme" && req.session.orientation == "bi")
 	{
-		return db.collection('users').find( {login: {$ne: req.session.user},  $or: [ { sex: 'femme', orientation: { $ne: 'hetero' } }, { sex: 'homme', orientation: { $ne: 'hommo' } } ], loc: loc
+		return db.collection('users').find( {login: {$ne: req.session.user},  $or: [ { sex: 'femme', orientation: { $ne: 'hetero' } }, { sex: 'homme', orientation: { $ne: 'hommo' } } ], loc: loc, age: {$gt: '18'}
 																																														 }).toArray();
 	}
 	else {
@@ -194,7 +199,7 @@ getPointsCommuns = async (arr1, arr2) => {
 
 giveTab = async (req, users, array, array_of_interets, tab) => {
 	users.forEach(async function(doc, err){
-		if (doc.age >= req.body.age_min && doc.age <= req.body.age_max)
+		if (doc.age >= req.body.age_min && doc.age <= req.body.age_max && doc.score >= req.body.score_min && doc.score <= req.body.score_max)
 		{
 			if (req.body.interets){
 				if (array && doc.interets)
@@ -292,19 +297,6 @@ router.post('/filtres', async function(req, res, next) {
 	res.end(JSON.stringify(array));
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 router.get('/profil', function(req, res, next) {
 	if (!req.session.user) {
 		res.redirect('/');
@@ -326,7 +318,7 @@ router.get('/profil', function(req, res, next) {
 										orientation: user.orientation,
 										bio: user.bio,
 										interets: user.interets,
-										photos: user.images
+										photos: user.photos
 										});
 				}
 			});
@@ -336,7 +328,7 @@ router.get('/profil', function(req, res, next) {
 
 var storage = multer.diskStorage({
 						destination: function (req, file, cb) {
-								cb(null, 'uploads/')
+								cb(null, 'public/uploads/')
 						},
 						filename: function (req, file, cb) {
 								cb(null, file.fieldname + '-' + Date.now() + '.jpg')
@@ -408,25 +400,39 @@ router.post('/edit_profil', upload,function(req, res, next) {
 	 			      { $addToSet: { interets: {$each: array }}
 				  });
 				}
-				if (req.body.photos != "")
-				{
-					upload(req, res, function (err) {
+				//if (req.body.file != "" && req.body.file != null)
+				//{
+          console.log('DEDANS')
+					upload(req, res, async function (err) {
 				    if (err) {
 				      // An error occurred when uploading
 				      return
 				    }
 						console.log('it\'s good');
 				    // Everything went fine
+            if (req.file != undefined) {
+              var photos = await db.collection('users').find({login: req.session.user}, {photos: 1}).toArray();
+              if (photos[0].photos.length >= 5)
+              {console.log('photo >= 5')
+                db.collection('users').updateOne(
+      	 			      { login: req.session.user },
+      	 			      { $pop: { photos: -1 }
+      				  });
+                db.collection('users').updateOne(
+      	 			      { login: req.session.user },
+      	 			      { $push: { photos: req.file.filename }
+      				  });
+              }
+              else {
+                console.log('photo < 5')
+                db.collection('users').updateOne(
+      	 			      { login: req.session.user },
+      	 			      { $push: { photos: req.file.filename }
+      				  });
+              }
+            }
 				  });
-
-
-
-					db.collection('users').updateOne(
-	 			      { login: req.session.user },
-	 			      { $set: { photos: req.body.photos }
-				  });
-				}
-			   db.close();
+				//}
 			});
 	}
 	res.redirect('/home/profil');
@@ -434,12 +440,22 @@ router.post('/edit_profil', upload,function(req, res, next) {
 
 
 router.post('/deconnexion', function(req, res, next) {
+  console.log('************************************')
+  mongo.connect(url, async function(err, db){
+    console.log('JE SUIS DEDANS')
+    db.collection('users').update(
+        { login: req.session.user },
+        { $set: { notifications: [] }
+    });
+  });
 	if (req.session) {
+    console.log('8888888888888888888888888888888888888');
 	    // delete session object
 	    req.session.destroy(function(err) {
 		  if (err) {
 		    console.log("Probleme de destruction de session");
 		  } else {
+        console.log('8888888888888888888888888888888888888');
 		    res.render('index', {
 				login: undefined,
 				message: "Byebye !"

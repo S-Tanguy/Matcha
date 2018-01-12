@@ -89,13 +89,15 @@
 				</div>
 
 				<%if (photos) { %>
-					 <p>Photos: <%= photos %>
+					 <p>Photos: <% for(var i=0; i < photos.length; i++) {%>
+                        <img src='http://localhost:3000/uploads/<%- photos[i] %>' />
+                      <% } %>
 						 <button class="modify_photos" type="button">Modify</button>
 					 </p>
 				<% } %>
 					<div class="choice_photos" <%if(photos){ %> style="display:none" <% } %> >
 						<p>Tes photos: </p>
-						<input class="input_choice_photos" type="file" name="file" /><br />
+						<input class="input_choice_photos" type="file" name="file"/><br />
 					</div>
 
 			<button type="submit" name="button">Valider les modifications</button>
@@ -104,7 +106,6 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function(){
-
 			$(".modify_email").click(function() {
 				$(".choice_email").toggle();
 				$(".input_choice_email").val("");
