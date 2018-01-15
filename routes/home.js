@@ -412,8 +412,8 @@ router.post('/edit_profil', upload,function(req, res, next) {
 				    // Everything went fine
             if (req.file != undefined) {
               var photos = await db.collection('users').find({login: req.session.user}, {photos: 1}).toArray();
-              if (photos[0].photos.length >= 5)
-              {console.log('photo >= 5')
+              if (photos[0].photos.length >= 4)
+              {console.log('photo >= 4')
                 db.collection('users').updateOne(
       	 			      { login: req.session.user },
       	 			      { $pop: { photos: -1 }
@@ -424,7 +424,7 @@ router.post('/edit_profil', upload,function(req, res, next) {
       				  });
               }
               else {
-                console.log('photo < 5')
+                console.log('photo < 4')
                 db.collection('users').updateOne(
       	 			      { login: req.session.user },
       	 			      { $push: { photos: req.file.filename }
@@ -440,22 +440,12 @@ router.post('/edit_profil', upload,function(req, res, next) {
 
 
 router.post('/deconnexion', function(req, res, next) {
-  console.log('************************************')
-  mongo.connect(url, async function(err, db){
-    console.log('JE SUIS DEDANS')
-    db.collection('users').update(
-        { login: req.session.user },
-        { $set: { notifications: [] }
-    });
-  });
 	if (req.session) {
-    console.log('8888888888888888888888888888888888888');
 	    // delete session object
 	    req.session.destroy(function(err) {
 		  if (err) {
 		    console.log("Probleme de destruction de session");
 		  } else {
-        console.log('8888888888888888888888888888888888888');
 		    res.render('index', {
 				login: undefined,
 				message: "Byebye !"

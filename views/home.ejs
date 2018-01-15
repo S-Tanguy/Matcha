@@ -3,42 +3,72 @@
   <head>
     <title>Accueil</title>
     <link rel='stylesheet' href='/stylesheets/home.css' />
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
   </head>
   <body>
-    <p>Welcome to <%= title %></p>
-	<a href="http://localhost:3000/home/profil">Go your profil	</a>
-	<div class="div_enter_data">
-		<form action="deconnexion" method="post">
-		    <div class="button">
-		        <button type="submit">Deconnexion</button>
-		    </div>
-		</form>
-	</div>
 
-	<div class="filtres">
+  <div class="bs-example">
+      <nav class="navbar navbar-default" style="min-width: 75px;">
+          <div class="navbar-header">
+              <button type="button" data-target="#navbarCollapse" data-toggle="collapse" class="navbar-toggle">
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand"><%= title %></a>
+          </div>
+          <div id="navbarCollapse" class="collapse navbar-collapse">
+              <ul class="nav navbar-nav">
+                  <li class="active"><a href="http://localhost:3000/home">Home</a></li>
+                  <li><a href="http://localhost:3000/home/profil">Your Profil</a></li>
+              </ul>
+              <ul class="nav navbar-nav navbar-right">
+                  <li><a id='deconnexion' href="#">Deconnexion</a></li>
+              </ul>
+          </div>
+      </nav>
+  </div>
+
+
+
+<div class="container">
+
+	<div class="filtres" >
 		<h2>Filtres: </h2>
 		<form id="form_filtres" method="post">
       <p>Age :
 			    <input type="number" name="age_min" value="18">
           <input type="number" name="age_max" value="85">
       </p>
-      <br>
       <p>Scores popularity :
           <input type="number" name="score_min" value="200">
           <input type="number" name="score_max" value="1000">
       </p>
-      <br>
       <p>Interets :
-          <input type="text" name="interets" placeholder="ex: #velo #fromage">
+          <input type="text" name="interets" placeholder="ex: velo fromage">
       </p>
-      <br>
       <p>Adresse :
         <input id="user_input_autocomplete_address" name="adresse" placeholder="Start typing your address...">
       </p>
-      <br>
         <input id="filtres_bouton" value="appliquer" type="submit">
 		</form>
 	</div>
+
+  <div class="my_info" >
+    <h2>My informations: </h2>
+		<form id="change_my_picture">
+      <p>New picture profil :
+        <input id="my_picture" name="my_picture" type="file">
+      </p>
+        <input id="picture_bouton" value="Change my profil picture" type="submit">
+		</form>
+  </div>
+
+</div>
+
 	<div class="suggestions">
 		<% users.forEach(function(user){ %>
 		<div class="user_suggestion">
@@ -143,6 +173,17 @@ $(document).on({
     ajaxStart: function() { $body.addClass("loading");    },
      ajaxStop: function() { $body.removeClass("loading"); }
 });
+
+  $("#deconnexion").click(function() {
+    $.ajax({
+      type: 'POST',
+      dataType: 'json',
+      contentType: 'application/json; charset=utf-8',
+      url: '/deconnexion',
+    });
+    window.location.replace("http://localhost:3000");
+  });
+
 
 	  $(".friends").click(function() {
   		alert('bite');

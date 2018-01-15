@@ -3,14 +3,17 @@
   <head>
     <title>Accueil</title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
   </head>
   <body>
 
 	  <% if (!locals.login) { %>
 
-	<div class="div_enter_data">
-		<% if (locals.message) { %>
-			<p><%= locals.message %></p>
+<div class="div_enter_data">
+	<% if (locals.message) { %>
+		<p><%= locals.message %></p>
 		<% } if (locals.error) { %>
 			<p><%= locals.error %></p>
 		<% } %>
@@ -20,66 +23,66 @@
 		</div>
 
 <!--   TEST AJAX -->
-                		<div id="form_div_su">
-                			<form id="register_form" method="post">
-                			    <div>
-                			        <label for="nom">Nom :</label>
-                			        <input name='nom' type="text" id="nom" />
-                			    </div>
-                				<br>
-                				<div>
-                			        <label for="prenom">Prénom :</label>
-                			        <input name='prenom' type="text" id="prenom" />
-                			    </div>
-                				<br>
-                				<div>
-                			        <label for="login">Nom d'utilisateur :</label>
-                			        <input name='login' type="text" id="login" />
-                			    </div>
-                				<br>
-                			    <div>
-                			        <label for="email">Email :</label>
-                			        <input name='email' type="email" id="email" />
-                			    </div>
-								<br>
-								<div>
-								<label for="sex_homme">Je suis un homme:</label>
-								<input type="radio" value="homme" name="sex" /><br />
-								<label for="sex_femme">Je suis une femme:</label>
-								<input type="radio" value="femme" name="sex" />
-								</div>
-                				<br>
-								<div>
-									<label for="orientation_hetero">Je suis hetero:</label>
-									<input type="radio" value="hetero" name="orientation" /><br />
-									<label for="orientation_hommo">Je suis hommo:</label>
-									<input type="radio" value="hommo" name="orientation" /><br />
-									<label for="orientation_bi">Je suis bi:</label>
-									<input type="radio" value="bi" name="orientation" /><br />
-								</div>
-								<br>
-                				<br>
-								<div class="date">
-									<label for="date">Date de naissance :</label>
-									<input type="date" name="date" id="date">
-								</div>
-								<br>
-                			    <div>
-                			        <label for="password">Password :</label>
-                			        <input name='password' type="password" id="password"></input>
-                			    </div>
-                				<br>
-                				<div>
-                			        <label for="password_conf">Password confirmation :</label>
-                			        <input name='password_conf' type="password" id="password_conf"></input>
-                			    </div>
-                				<br>
-                			    <div >
-                			        <input id="register_bouton" class="buttontest" type="button" value="Sign up"/>
-                			    </div>
-                			</form>
-                		</div>
-                	</div>
+<div id="form_div_su">
+  <form class="form-inline" role="form" id="register_form" method="post">
+    <div class="form-group">
+        <label for="nom">Nom :</label>
+        <input name='nom' type="text" id="nom" />
+    </div>
+		<br>
+		<div class="form-group">
+	        <label for="prenom">Prénom :</label>
+	        <input name='prenom' type="text" id="prenom" />
+	    </div>
+		<br>
+		<div class="form-group">
+	        <label for="login">Nom d'utilisateur :</label>
+	        <input name='login' type="text" id="login" />
+	    </div>
+		<br>
+    <div>
+        <label for="email">Email :</label>
+        <input name='email' type="email" id="email" />
+    </div>
+		<br>
+		<div>
+			<label for="sex_homme">Je suis un homme :</label>
+			<input type="radio" value="homme" name="sex" /><br />
+			<label for="sex_femme">Je suis une femme :</label>
+			<input type="radio" value="femme" name="sex" />
+		</div>
+    <br>
+		<div>
+			<label for="orientation_hetero">Je suis hetero :</label>
+			<input type="radio" value="hetero" name="orientation" /><br />
+			<label for="orientation_hommo">Je suis hommo :</label>
+			<input type="radio" value="hommo" name="orientation" /><br />
+			<label for="orientation_bi">Je suis bi :</label>
+			<input type="radio" value="bi" name="orientation" /><br />
+		</div>
+		<br>
+    <br>
+		<div class="date">
+			<label for="date">Date de naissance :</label>
+			<input type="date" name="date" id="date">
+		</div>
+		<br>
+    <div>
+      <label for="password">Password :</label>
+      <input name='password' type="password" id="password"></input>
+    </div>
+	  <br>
+  	<div>
+        <label for="password_conf">Password confirmation :</label>
+        <input name='password_conf' type="password" id="password_conf"></input>
+    </div>
+  	   <br>
+        <div >
+            <input id="register_bouton" class="buttontest" type="button" value="Sign up"/>
+        </div>
+    </form>
+  </div>
+</div>
 <!-- FIN TEST -->
 
 	<div class="div_enter_data">

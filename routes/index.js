@@ -272,7 +272,18 @@ router.post('/connexion', function(req, res, next) {
 	}
 });
 
-router.post('/deconnexion', function(req, res, next) {
+function deleteNotifs(login){
+	mongo.connect(url, function(err, db) {
+		db.collection('users').updateOne({login: login}, { $set: { notifications: [] } }, async function(err, isgood){
+			if (isgood){
+				console.log('effacement des notifs passee good');
+			}
+		});
+	});
+}
+
+router.post('/deconnexion', async function(req, res, next) {
+	await deleteNotifs(req.session.user)
 	if (req.session) {
 	    // delete session object
 	    req.session.destroy(function(err) {

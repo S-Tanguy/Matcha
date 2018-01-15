@@ -17,7 +17,7 @@
 				<p>Orientation sexuelle: <%= user.orientation %></p>
 				<p>Interets: <%= user.interets %></p>
 				<p>Description: <%= user.bio %></p>
-				<p>Photos: <% for(var i=0; i < user.photos.length; i++) {%>
+				<p>Photos: <% for(var i=0; i < 4; i++) {%>
 										 <img src='http://localhost:3000/uploads/<%- user.photos[i] %>' />
 									 <% } %></p>
 			</div>

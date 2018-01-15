@@ -22,8 +22,27 @@ float: left;
 overflow: auto;
 }
 
+.notificationss {
+	display: inline-block;
+border: 1px solid black;
+width: 20%;
+height: 500px;
+overflow: auto;
+}
+
 .main {
 	border: 1px solid black;
+}
+
+.filtres {
+	display: inline-block;
+	float: left;
+}
+
+.my_info {
+	display: inline-block;
+	float: left;
+	margin-left: 3vmin;
 }
 
 
@@ -38,6 +57,11 @@ overflow: auto;
 
 .error {
 	color: red;
+}
+
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 .whisper {
