@@ -107,8 +107,11 @@
 					<p>Ta biodescription:</p>
 					<input class="input_choice_bio" name="bio" /><br />
 				</div>
+        <br>
 			<%if (interets) { %>
-				 <p>Interets: <%= interets %>
+				 <p>Interets: <% for(var i=0; i < interets.length; i++) {%>
+            <button type="button" class="interets" class="btn btn-primary btn-lg active"><%= interets[i] %></button>
+           <% } %>
 					 <button class="modify_interets" type="button">Modify</button>
 				 </p>
 			<% } %>
@@ -117,17 +120,31 @@
 					<input class="input_choice_interets" type="text" name="interets" placeholder="surf, animaux, foot..."  /><br />
 				</div>
 
+
+        <%if (picture_profil) { %>
+          <p> Photo de profil:
+            <img src='http://localhost:3000/uploads/<%- picture_profil %>' />
+            <button class="modify_picture_profil" type="button">Modify</button>
+           </p>
+        <% } %>
+          <div class="choice_picture_profil" <%if(picture_profil){ %> style="display:none" <% } %> >
+            <p>Ajoute ta nouvelle photo de profil: </p>
+            <input class="input_choice_picture_profil" type="file" name="picture_profil"/><br />
+          </div>
+
 				<%if (photos) { %>
-					 <p>Photos: <% for(var i=0; i < 4; i++) {%>
+					 <p>Photos: <% for(var i=0; i < photos.length; i++) {%>
                         <img src='http://localhost:3000/uploads/<%- photos[i] %>' />
                       <% } %>
 						 <button class="modify_photos" type="button">Modify</button>
 					 </p>
 				<% } %>
 					<div class="choice_photos" <%if(photos){ %> style="display:none" <% } %> >
-						<p>Tes photos: </p>
+						<p>Ajoute une nouvelle photo a ton album de 4 photos (s'il y'en a plus de 4 la premiere sera supprimee): </p>
 						<input class="input_choice_photos" type="file" name="file"/><br />
 					</div>
+
+      <!--  <input type="file" name="picture_profil"/><br /> -->
 
 			<button type="submit" name="button">Valider les modifications</button>
 		</form>
@@ -136,6 +153,19 @@
 	<script type="text/javascript">
 		$(document).ready(function(){
 
+
+      $(".interets").click(function() {
+        $.ajax({
+          type: 'POST',
+          dataType: 'json',
+          contentType: 'application/json; charset=utf-8',
+          data: JSON.stringify({
+            interets: $(this).text()
+          }),
+          url: '/kill_interets',
+        });
+        $('button').remove( ":contains(" + $(this).text() + ")" );
+      });
 
 
 
@@ -192,6 +222,11 @@
 			$(".modify_photos").click(function() {
 				$(".choice_photos").toggle();
 				$(".input_choice_photos").val("");
+			});
+
+      $(".modify_picture_profil").click(function() {
+				$(".choice_picture_profil").toggle();
+				$(".input_choice_picture_profil").val("");
 			});
 
 		});

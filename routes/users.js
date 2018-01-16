@@ -19,7 +19,7 @@ router.get('/:login', function(req, res, next) {
   	mongo.connect(url, function(err, db) {
   		db.collection('users').findOne({login: req.params.login}, async function(error, Userfound) {
         let signal = await db.collection('users').findOne({login: req.session.user, user_signal: { $in: [req.params.login]}});
-        let mes_photos = await db.collection('users').findOne({login: req.session.user}, {photos: 1});
+        let mes_photos = await db.collection('users').findOne({login: req.session.user}, {picture_profil: 1});
         await db.collection('users').findOne({login: req.session.user, blok_users: { $in :[req.params.login]}}, async function (error, result){
           if (result){
       			if (err){
@@ -36,17 +36,17 @@ router.get('/:login', function(req, res, next) {
             await db.collection('users').findOne({login: req.session.user, like: { $in : [req.params.login]}}, async function (err, is_in_like){
               if (is_in_like){
                 if (signal){
-                  res.render('showprofil', {me: req.session.user, user: Userfound, blok_user: false, is_like: true, signal: true, mes_photos: mes_photos.photos})
+                  res.render('showprofil', {me: req.session.user, user: Userfound, blok_user: false, is_like: true, signal: true, mes_photos: mes_photos.picture_profil})
                 }
                 else {
-                  res.render('showprofil', {me: req.session.user, user: Userfound, blok_user: false, is_like: true, signal: false, mes_photos: mes_photos.photos})
+                  res.render('showprofil', {me: req.session.user, user: Userfound, blok_user: false, is_like: true, signal: false, mes_photos: mes_photos.picture_profil})
                 }
               }
               else{
                 if (signal)
-                  res.render('showprofil', {me: req.session.user, user: Userfound, blok_user: false, is_like: false, signal: true, mes_photos: mes_photos.photos})
+                  res.render('showprofil', {me: req.session.user, user: Userfound, blok_user: false, is_like: false, signal: true, mes_photos: mes_photos.picture_profil})
                 else
-                  res.render('showprofil', {me: req.session.user, user: Userfound, blok_user: false, is_like: false, signal: false, mes_photos: mes_photos.photos})
+                  res.render('showprofil', {me: req.session.user, user: Userfound, blok_user: false, is_like: false, signal: false, mes_photos: mes_photos.picture_profil})
               }
             });
           }

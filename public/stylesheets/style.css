@@ -38,3 +38,8 @@ a {
 form {
 	padding-top: 10px;
 }
+
+.interets {
+  display: inline-block;
+  color: blue;
+}

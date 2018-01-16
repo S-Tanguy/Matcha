@@ -318,7 +318,8 @@ router.get('/profil', function(req, res, next) {
 										orientation: user.orientation,
 										bio: user.bio,
 										interets: user.interets,
-										photos: user.photos
+										photos: user.photos,
+                    picture_profil: user.picture_profil
 										});
 				}
 			});
@@ -335,7 +336,9 @@ var storage = multer.diskStorage({
 							}
 });
 
-var upload = multer({ storage: storage }).single('file');
+var upload = multer({ storage: storage }).fields([{ name: 'file', maxCount: 1 }, { name: 'picture_profil', maxCount: 1 }])
+
+// var upload_picture = multer({ storage: storage }).single('picture_profil');
 
 splitInterets = async (str) => {
 	return str.replace(/\s\s+/g, ' ').split(" ");
@@ -343,7 +346,7 @@ splitInterets = async (str) => {
 
 
 
-router.post('/edit_profil', upload,function(req, res, next) {
+router.post('/edit_profil', upload, function(req, res, next) {
 	if (req.session.user) {
 			mongo.connect(url, async function(err, db){
 				console.log('ici');
@@ -403,36 +406,37 @@ router.post('/edit_profil', upload,function(req, res, next) {
 				//if (req.body.file != "" && req.body.file != null)
 				//{
           console.log('DEDANS')
-					upload(req, res, async function (err) {
-				    if (err) {
-				      // An error occurred when uploading
-				      return
-				    }
-						console.log('it\'s good');
-				    // Everything went fine
-            if (req.file != undefined) {
-              var photos = await db.collection('users').find({login: req.session.user}, {photos: 1}).toArray();
-              if (photos[0].photos.length >= 4)
-              {console.log('photo >= 4')
-                db.collection('users').updateOne(
-      	 			      { login: req.session.user },
-      	 			      { $pop: { photos: -1 }
-      				  });
-                db.collection('users').updateOne(
-      	 			      { login: req.session.user },
-      	 			      { $push: { photos: req.file.filename }
-      				  });
-              }
-              else {
-                console.log('photo < 4')
-                db.collection('users').updateOne(
-      	 			      { login: req.session.user },
-      	 			      { $push: { photos: req.file.filename }
-      				  });
-              }
+					console.log('it\'s good');
+			   // Everything went fine
+          if (req.files.file) {
+            var photos = await db.collection('users').find({login: req.session.user}, {photos: 1}).toArray();
+            if (photos[0].photos.length >= 4)
+            {console.log('photo >= 4')
+              db.collection('users').updateOne(
+    	 			      { login: req.session.user },
+    	 			      { $pop: { photos: -1 }
+    				  });
+              db.collection('users').updateOne(
+    	 			      { login: req.session.user },
+    	 			      { $push: { photos: req.files.file[0].filename }
+    				  });
             }
-				  });
-				//}
+            else {
+              console.log('photo < 4')
+              db.collection('users').updateOne(
+    	 			      { login: req.session.user },
+    	 			      { $push: { photos: req.files.file[0].filename }
+    				  });
+            }
+          }
+          if (req.files.picture_profil) {
+            db.collection('users').updateOne(
+                { login: req.session.user },
+                { $set: { picture_profil: req.files.picture_profil[0].filename }
+            });
+          }
+
+			//	}
 			});
 	}
 	res.redirect('/home/profil');

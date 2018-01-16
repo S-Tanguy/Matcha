@@ -17,7 +17,8 @@
 				<p>Orientation sexuelle: <%= user.orientation %></p>
 				<p>Interets: <%= user.interets %></p>
 				<p>Description: <%= user.bio %></p>
-				<p>Photos: <% for(var i=0; i < 4; i++) {%>
+				<p>Photo de profil: <img src='http://localhost:3000/uploads/<%- user.picture_profil %>' /></p>
+				<p>Photos: <% for(var i=0; i < user.photos.length; i++) {%>
 										 <img src='http://localhost:3000/uploads/<%- user.photos[i] %>' />
 									 <% } %></p>
 			</div>
@@ -28,7 +29,7 @@
 				 <p><%= user.login %>, ne souhaite pas afficher sa localisation</p>
 			</div>
 			<% } %>
-			<% if (mes_photos.length >= 1) { %>
+			<% if (mes_photos) { %>
 				<% if (is_like == false) {%>
 					<div class="like">
 						<a id="like_button" href="" >Je like <%= user.login %></a>
@@ -39,7 +40,7 @@
 					</div>
 				<% } %>
 			<% } else { %>
-				<p> Vous devez au moins avoir une photo sur votre profil pour liker ou disliker un utilisateur </p>
+				<p> Vous devez avoir une photo de profil pour liker ou disliker un utilisateur </p>
 			<% } %>
 			<div class="blok">
 				<a id="blok_button" href="" >Je blok <%= user.login %></a>

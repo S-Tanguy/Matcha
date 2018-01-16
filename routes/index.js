@@ -180,7 +180,8 @@ router.post('/testajax', function(req, res, next) {
 						like: [],
 						liker: [],
 						score: 200,
-						photos: []
+						photos: [],
+						picture_profil: null
 
 						//interets: null,
 						//bio: null
@@ -281,6 +282,16 @@ function deleteNotifs(login){
 		});
 	});
 }
+
+router.post('/kill_interets', async function(req, res, next){
+	mongo.connect(url, function(err, db) {
+		db.collection('users').updateOne({login: req.session.user}, { $pull: { interets: req.body.interets } }, async function(err, isdelete){
+			if (isdelete){
+				console.log('effacement d\'un interets good');
+			}
+		});
+	});
+})
 
 router.post('/deconnexion', async function(req, res, next) {
 	await deleteNotifs(req.session.user)
