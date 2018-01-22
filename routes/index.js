@@ -335,7 +335,6 @@ router.post('/kill_photo', async function(req, res, next){
 router.post('/deconnexion', async function(req, res, next) {
 	await deleteNotifs(req.session.user)
 	if (req.session) {
-	    // delete session object
 	    req.session.destroy(function(err) {
 		  if (err) {
 		    console.log("Probleme de destruction de session");

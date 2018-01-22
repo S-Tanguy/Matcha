@@ -32,13 +32,6 @@
         </nav>
     </div>
 
-
-
-
-
-
-
-
 	<div class="data_profil">
 		<h3>Your informations</h3>
 		<form action="/home/edit_profil" method="post" enctype="multipart/form-data">
@@ -148,8 +141,6 @@
 						<input class="input_choice_photos" type="file" name="file"/><br />
 					</div>
 
-      <!--  <input type="file" name="picture_profil"/><br /> -->
-
 			<button type="submit" name="button">Valider les modifications</button>
 		</form>
 	</div>
@@ -163,7 +154,6 @@
 
       socket.emit('new user', <%-JSON.stringify(login)%>, function(data){
          if (data) {
-         //  $('#nickWrap').hide();
            $('#contentWrap').show();
          }
          else {
@@ -210,11 +200,6 @@
         });
         window.location.replace("http://localhost:3000");
       });
-
-
-
-
-
 
 			$(".modify_email").click(function() {
 				$(".choice_email").toggle();

@@ -15,12 +15,9 @@ var app = express();
 
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-// view engine setup
+
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
-
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 
 //////////////////////////////// MIDDLEWEAR
 app.use(logger('dev'));
@@ -28,12 +25,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '/public')));
-//app.use('/js', express.static(__dirname + '/node_modules/bootstrap/dist/js')); // redirect bootstrap JS
-//app.use('/css', express.static(__dirname + '/node_modules/bootstrap/dist/css')); // redirect CSS bootstrap
-app.use('/', express.static(__dirname + '/www')); // redirect root
-app.use('/js', express.static(__dirname + '/node_modules/bootstrap/dist/js')); // redirect bootstrap JS
-app.use('/js', express.static(__dirname + '/node_modules/jquery/dist')); // redirect JS jQuery
-app.use('/css', express.static(__dirname + '/node_modules/bootstrap/dist/css')); // redirect CSS bootstrap
+app.use('/', express.static(__dirname + '/www'));
+app.use('/js', express.static(__dirname + '/node_modules/bootstrap/dist/js'));
+app.use('/js', express.static(__dirname + '/node_modules/jquery/dist'));
+app.use('/css', express.static(__dirname + '/node_modules/bootstrap/dist/css'));
 app.use(session({
   secret: 'fluteabec',
   resave: false,
@@ -67,7 +62,6 @@ io.on('connection', function(socket){
           users[data.user_like].emit('someOneLikeYou', data.like_autor);
         }
       });
-			console.log('dialogue enregistré');
 		});
   });
 
@@ -94,10 +88,6 @@ io.on('connection', function(socket){
 
 
   socket.on('chat message', async function(data, callback){
-	  console.log(data.desti + "ICI");
-	  console.log(data.msg);
-	  //console.log(user[name]);
-	  //if (name in users){
 	  	var conv = [data.desti, socket.nickname];
 		conv.sort();
 		var conversation = "" + conv[0] + "_" + conv[1] + "";
@@ -105,7 +95,6 @@ io.on('connection', function(socket){
 
     await mongo.connect(url, async function(err, db) {
 			await db.collection('chat').update({conversation: conversation}, {$push: {messages: {autor: socket.nickname, msg: data.msg}}}, {upsert: true});
-			console.log('dialogue enregistré');
       html = `<br><div class=notifSomeOneSendMessage> <p> ${socket.nickname} send you a new message </p> </div><br><hr>`
       await db.collection('users').updateOne({login: data.desti}, {$push: {notifications: html}})
 		});
@@ -113,34 +102,6 @@ io.on('connection', function(socket){
 		      users[data.desti].emit('whisper', {msg: data.msg, nick: socket.nickname, div_chat: data.desti});
           users[data.desti].emit('notifNewMessage', socket.nickname);
       }
-
-
-		  console.log('Whisper!');
-	 // }
-	 /* //var msg = data.trim();
-	  if (msg.substr(0, 3) === '/w '){
-		  msg = msg.substr(3);
-		  var ind = msg.indexOf(' ');
-
-		  if (ind !== -1)
-		  {
-			  var name = msg.substring(0, ind);
-			  var msg = msg.substring(ind + 1);
-			  if (name in users){
-				  users[name].emit('whisper', {msg: msg, nick: socket.nickname});
-				  console.log('Whisper!');
-			  }
-			  else {
-				  callback('Error ! Enter a valide User');
-			  }
-	  	  }
-		  else {
-			  callback('Error! please enter a message for your whisper!');
-	  	  }
-	  } else {
-	  	io.sockets.emit('new message', {msg: msg, nick: socket.nickname});
-    console.log('message: ' + msg);
-}*/
   });
 
   socket.on('charge old messages', async function(data, callback){
@@ -166,7 +127,7 @@ io.on('connection', function(socket){
       await mongo.connect(url, async function(err, db) {
         var today = new Date();
         var dd = today.getDate();
-        var mm = today.getMonth()+1; //January is 0!
+        var mm = today.getMonth()+1;
         var yyyy = today.getFullYear();
 
         if(dd<10) {
@@ -193,13 +154,12 @@ io.on('connection', function(socket){
 
   socket.on('disconnect', async function(){
 	nicknames = "";
-    console.log('user disconnected');
     if (!socket.nickname) return;
 	delete users[socket.nickname];
   await mongo.connect(url, async function(err, db) {
     var today = new Date();
     var dd = today.getDate();
-    var mm = today.getMonth()+1; //January is 0!
+    var mm = today.getMonth()+1;
     var yyyy = today.getFullYear();
 
     if(dd<10) {
@@ -224,20 +184,17 @@ http.listen(3003, function(){
   console.log('listening on *:3003');
 });
 
-// catch 404 and forward to error handler
+
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
   next(err);
 });
 
-// error handler
+
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
   res.status(err.status || 500);
   res.send('Page 404 desole cette page n\'existe pas');
 });
