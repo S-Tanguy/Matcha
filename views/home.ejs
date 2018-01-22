@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Accueil</title>
+    <link rel='stylesheet' href='/stylesheets/home.css' />
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+  </head>
+  <body>
+
+  <div class="bs-example">
+      <nav class="navbar navbar-default" style="min-width: 75px;">
+          <div class="navbar-header">
+              <button type="button" data-target="#navbarCollapse" data-toggle="collapse" class="navbar-toggle">
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand"><%= title %></a>
+          </div>
+          <div id="navbarCollapse" class="collapse navbar-collapse">
+              <ul class="nav navbar-nav">
+                  <li class="active"><a href="http://localhost:3000/home">Home</a></li>
+                  <li><a href="http://localhost:3000/home/profil">Your Profil</a></li>
+              </ul>
+              <ul class="nav navbar-nav navbar-right">
+                  <li><a id='deconnexion' href="#">Deconnexion</a></li>
+              </ul>
+          </div>
+      </nav>
+  </div>
+
+
+<div class="container">
+	<div class="filtres" >
+		<h2>Filtres: </h2>
+		<form id="form_filtres" method="post">
+      <p>Age :
+			    <input type="number" name="age_min" value="18" min="18">
+          <input type="number" name="age_max" value="85" max="99">
+      </p>
+      <p>Scores popularity :
+          <input type="number" name="score_min" value="0">
+          <input type="number" name="score_max" value="1000">
+      </p>
+      <p>Interets (le tri prend le dessus sur ces interets):
+          <input type="text" name="interets" placeholder="ex: velo fromage">
+      </p>
+      <p>Adresse :
+        <input id="user_input_autocomplete_address" name="adresse" placeholder="Start typing your address...">
+      </p>
+      <!--<p>Trier par:
+        Localisation: <input class="tri_localisation" type="radio" value="localisation" name="tri" />
+        Age: <input class="tri_age" type="radio" value="localisation" name="tri" />
+        Interets: <input class="input_interets" type="radio" value="localisation" name="tri" />
+        Score: <input class="input_score" type="radio" value="localisation" name="tri" />
+      </p>-->
+      <p>
+        Tri :<input list="trie" name="trie" value="Localisation (plus près)">
+        <datalist id="trie">
+          <option value="Age croissant">
+          <option value="Age decroissant">
+          <option value="Score croissant">
+          <option value="Score decroissant">
+          <option value="Localisation (plus près)">
+          <option value="Interets">
+        </datalist>
+      </p>
+      <p>Search someone with login :
+        <input id="search_someone" name="search" type="text" placeholder="Login of someone..">
+      </p>
+        <input id="filtres_bouton" value="appliquer" type="submit">
+		</form>
+	</div>
+
+  <div class="my_info" >
+    <h2>My informations: </h2>
+    <h4> <%= info[0].nom %> - <%= info[0].prenom %></h4>
+    <h5> <%= info[0].email %></h5>
+    <h4> SCORE: <%= info[0].score %></h4>
+  </div>
+
+  <div class="profil_picture">
+    <%if (info[0].picture_profil) {%>
+      <img src="uploads/<%= info[0].picture_profil %>">
+      <% }%>
+  </div>
+
+</div>
+
+	<div class="suggestions">
+		<% users.forEach(function(user){ %>
+		<div class="user_suggestion">
+			<p>
+    			<%= user.nom %> - <%= user.prenom %> - <%= user.login %>
+				<br>
+				Age : <%= user.age %>
+			</p>
+			<h3><%= user.sex %> - <%= user.orientation %></h3>
+      <h4>Score popularity: <%= user.score %></h4>
+			<a href='users/<%= user.login %>'>Go profil</a>
+		</div>
+  		<% }); %>
+	</div>
+  <div class="notifications">
+    <h2>Notifications</h2>
+    <hr>
+    <% if (notifications) { %>
+    <% for(var i=0 ;i < notifications.length ;i++) { %>
+      <p><%- notifications[i].notifications%></p>
+    <% } %>
+    <% } %>
+  </div>
+  <%if (viewers) { %>
+    <p>10 last viewers !</p>
+    <div class="viewer_of_my_profil">
+      <% for(var i=0 ;i < 10 ;i++) { %>
+        <p><%= viewers[i] %></p>
+      <% } %>
+    </div>
+  <% } %>
+  <br> <br>
+  <p>Friends</p>
+	<div class="amis">
+    <% for(var i=0 ;i < friends.length ;i++) { %>
+      <p><%= friends[i].login %></p>
+    <% } %>
+	</div>
+
+
+
+      <p>Friends inline</p>
+      <div id="users"></div>
+	  <div id="allchat"></div>
+<div class="modal"></div>
+<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js"></script>
+
+  <script src="http://localhost:3003/socket.io/socket.io.js"></script>
+  <script type="text/javascript"
+    src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyCYV5V1wefNwQQ_5ukp4SLtcqmrUh2Kp48">
+  </script>
+
+
+
+
+
+<!-- pour add l'input avec l'autocomplete -->
+  <script type="text/javascript">
+  function initializeAutocomplete(id) {
+var element = document.getElementById(id);
+if (element) {
+  var autocomplete = new google.maps.places.Autocomplete(element, { types: ['geocode'] });
+  google.maps.event.addListener(autocomplete, 'place_changed', onPlaceChanged);
+}
+}
+
+function onPlaceChanged() {
+  var place = this.getPlace();
+
+  // console.log(place);  // Uncomment this line to view the full object returned by Google API.
+
+  for (var i in place.address_components) {
+    var component = place.address_components[i];
+    for (var j in component.types) {  // Some types are ["country", "political"]
+      var type_element = document.getElementById(component.types[j]);
+      if (type_element) {
+        type_element.value = component.long_name;
+      }
+    }
+  }
+}
+
+google.maps.event.addDomListener(window, 'load', function() {
+  initializeAutocomplete('user_input_autocomplete_address');
+});
+
+
+
+
+
+
+  </script>
+  <script type="text/javascript">
+  $(document).ready(function(){
+
+    $body = $("body");
+
+$(document).on({
+    ajaxStart: function() { $body.addClass("loading");    },
+     ajaxStop: function() { $body.removeClass("loading"); }
+});
+
+  $("#deconnexion").click(function() {
+    $.ajax({
+      type: 'POST',
+      dataType: 'json',
+      contentType: 'application/json; charset=utf-8',
+      url: '/deconnexion',
+    });
+    window.location.replace("http://localhost:3000");
+  });
+
+
+	  $(".friends").click(function() {
+  		alert('bite');
+  	 });
+    $('#form_filtres').submit(function () {
+      $('.user_suggestion').remove();
+      var userss = <%- JSON.stringify(users) %>
+  			$.ajax({
+  			  type: 'POST',
+          dataType: 'json',
+  			  data: JSON.stringify({
+            userss: userss,
+            age_min: $('#form_filtres input[name=age_min]').val(),
+            age_max: $('#form_filtres input[name=age_max]').val(),
+            score_min: $('#form_filtres input[name=score_min]').val(),
+            score_max: $('#form_filtres input[name=score_max]').val(),
+            interets: $('#form_filtres input[name=interets]').val(),
+            adresse: $('#form_filtres input[name=adresse]').val(),
+            trie: $('#form_filtres input[name=trie]').val(),
+            search: $('#form_filtres input[name=search]').val(),
+  					}),
+  			  contentType: 'application/json; charset=utf-8',
+  			  url: '/home/filtres',
+  			}).done (function (data) {
+          //$('.user_suggestion').remove();
+          if (data == 'search_exist')
+            window.location.href = 'http://localhost:3000/users/' + $('#form_filtres input[name=search]').val();
+          if (data == 'search_no_exist')
+            window.location.href = 'http://localhost:3000/home';
+          data.forEach(function(user){
+            let div = document.createElement('div');
+            div.setAttribute("class", "user_suggestion");
+            //div.append("<p>" + user.nom + " - " + user.prenom + " - " + user.login +" <br> Age : " + user.age + "</p> <h3>" + user.sex + " - " + user.orientation + "</h3> <a href=users/"+user.login+">Go profil</a>");
+          //  div.html  ("<h3>FLUTE</h3>")
+          let test = `
+          <div class="user_suggestion"><p> ${user.nom} -  ${user.prenom} - ${user.login} <br> Age : ${user.age} </p>
+          <h3> ${user.sex} - ${user.orientation} </h3> <h4>Score popularity: ${user.score}</h4> <a href=users/${user.login}>Go profil</a></div>
+
+          `;
+            $('.suggestions').append(test);
+            console.log(user);
+          });
+          console.log(data);
+        });
+  			 //$(':input', '#form_filtres').not(':button, :submit, :reset, :hidden')
+  			 //.val('');
+  			return false;
+  		});
+
+  $(function () {
+    var socket = io.connect('http://localhost:3003');
+	var user_name = <%- JSON.stringify(title) %>;
+  var friends = <%- JSON.stringify(friends) %>
+
+
+    //$('#setNick').submit(function(e){
+     // e.preventDefault();
+      socket.emit('new user', user_name, function(data){
+         if (data) {
+         //  $('#nickWrap').hide();
+           $('#contentWrap').show();
+         }
+         else {
+           $('#nickError').html('That username is already taken ! try again.');
+         }
+      });
+     // $('#nickname').val('');
+    //});
+    socket.on('someOneLikeYou', function(like_autor){
+      html = `<br><div class=notifSomeOneLikeYou> <p> ${like_autor} like you </p> </div><br><hr>`;
+      $('.notifications').append(html);
+    });
+
+    socket.on('someOneLikeYouInBack', function(like_autor){
+      html = `<br><div class=notifSomeOneLikeYouInBack> <p> ${like_autor} like you in back</p> </div><br><hr>`;
+      $('.notifications').append(html);
+    });
+
+    socket.on('someOneDislikeYou', function(dislike_autor){
+      html = `<br><div class=notifSomeOneLikeYouInBack> <p> ${dislike_autor} dislike you </p> </div><br><hr>`;
+      $('.notifications').append(html);
+    });
+
+    socket.on('someOneVisitYourProfil', function(visit_autor){
+      html = `<br><div class=notifSomeOneVisitYou> <p> ${visit_autor} visit your profil </p> </div><br><hr>`;
+      $('.notifications').append(html);
+    });
+
+    socket.on('notifNewMessage', async function(autor_message){
+      html = `<br><div class=notifSomeOneSendMessage> <p> ${autor_message} send you a new message </p> </div><br><hr>`;
+      $('.notifications').append(html);
+    });
+
+    socket.on('usernames', function(data){
+      var html = '';
+      for(i = 0;i < data.length; i++){
+        for(j = 0;j < friends.length; j++)
+        {
+    		  if (data[i] != user_name && data[i] == friends[j].login)
+            	html += "<p class='friends'>" + data[i] + "</p><br/>";
+        }
+      }
+      $('#users').html(html);
+	  $(".friends").click(function() {
+		let desti = $(this)[0].innerText;
+		if(document.getElementById(desti) == null)
+		{
+			let input = document.createElement('input');
+			input.setAttribute("type", "text");
+
+			let button = document.createElement('button');
+			button.setAttribute("type", "submit");
+			button.setAttribute("value", "send message");
+			button.append("Send");
+
+			let form = document.createElement('form');
+			form.setAttribute("class", "form_mp");
+			form.setAttribute("id", desti);
+			form.appendChild(input);
+			form.appendChild(button);
+
+			let conv = document.createElement('div');
+
+			let header = document.createElement('div');
+			header.innerHTML += desti;
+
+			let chat = document.createElement('div');
+			chat.setAttribute("id", desti);
+			chat.appendChild(header);
+			chat.appendChild(conv);
+			chat.appendChild(form);
+
+			let allchat = document.getElementById("allchat");
+			 //chat.style.backgroundColor = "white";
+			 //chat.style.height = "300px";
+			 //chat.style.width = "300px";
+			allchat.style.border = "1px solid black";
+			allchat.appendChild(chat);
+			socket.emit('charge old messages', {desti: desti, autor: <%- JSON.stringify(title) %>}, function(){
+
+			});
+			socket.on('append old messages', async function(data){
+        if (data.elem[0]){
+          for(var el in data.elem[0].messages){
+            $('#' + desti).append($('<li>').text(data.elem[0].messages[el].autor + ': ' + data.elem[0].messages[el].msg));
+          }
+        }
+		    });
+			//}
+			$('#' + desti).submit(function(){
+				socket.emit('chat message', {desti: desti, msg: $(':input', '#' + desti).val()}, function(data){
+					$('#messages').append("<span class='error'><li>" + data + "</li></span>");
+				});
+				$('#' + desti).append($('<li>').text(<%- JSON.stringify(title) %> + ': ' + $(':input', '#' + desti).val()))
+				$(':input', '#' + desti).val('');
+				return false;
+			});
+		}
+  	});
+    });
+
+
+
+	socket.on('whisper', function(data) {
+		// console.log(document.getElementById(data.nick));
+		if(document.getElementById(data.nick) == null)
+		{
+			let desti = data.nick;
+
+			let input = document.createElement('input');
+			input.setAttribute("type", "text");
+
+			let button = document.createElement('button');
+			button.setAttribute("type", "submit");
+			button.setAttribute("value", "send message");
+			button.append("Send");
+
+			let form = document.createElement('form');
+			form.setAttribute("class", "form_mp");//
+			form.setAttribute("id", data.nick);
+			form.appendChild(input);
+			form.appendChild(button);
+
+			let conv = document.createElement('div');
+
+			let header = document.createElement('div');
+			header.innerHTML += desti;
+
+			let chat = document.createElement('div');
+			chat.setAttribute("id", desti);
+			chat.appendChild(header);
+			chat.appendChild(conv);
+			chat.appendChild(form);
+
+			let allchat = document.getElementById("allchat");
+			 //chat.style.backgroundColor = "white";
+			 //chat.style.height = "300px";
+			 //chat.style.width = "300px";
+			allchat.style.border = "1px solid black";
+			allchat.appendChild(chat);
+      socket.emit('charge old messages', {desti: desti, autor: <%- JSON.stringify(title) %>}, function(){
+
+			});
+			socket.on('append old messages', async function(data){
+        if (data.elem[0]){
+          for(var el in data.elem[0].messages){
+            $('#' + desti).append($('<li>').text(data.elem[0].messages[el].autor + ': ' + data.elem[0].messages[el].msg));
+          }
+        }
+		    });
+			$('#' + data.nick).submit(function(){
+				socket.emit('chat message', {desti: desti, msg: $(':input', '#' + data.nick).val()}, function(data){
+					$('#messages').append("<span class='error'><li>" + data + "</li></span>");
+				});
+				$('#' + data.nick).append($('<li>').text(<%- JSON.stringify(title) %> + ': ' + $(':input', '#' + data.nick).val()))
+				$(':input', '#' + data.nick).val('');
+				return false;
+			});
+		}
+		$('#' + data.nick).append("<span class='whisper'><li>" + data.nick  + ": " + data.msg + "</li></span>");
+
+	});
+  });
+});
+  </script>
+
+  </body>
+</html>

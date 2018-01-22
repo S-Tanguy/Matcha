@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+  <head>
+	 <meta charset="utf-8">
+    <title>Accueil</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+  </head>
+  <body>
+    <div class="bs-example">
+        <nav class="navbar navbar-default">
+            <div class="navbar-header">
+                <button type="button" data-target="#navbarCollapse" data-toggle="collapse" class="navbar-toggle">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand"><%= login %></a>
+            </div>
+            <div id="navbarCollapse" class="collapse navbar-collapse">
+                <ul class="nav navbar-nav">
+                    <li><a href="http://localhost:3000/home">Home</a></li>
+                    <li class="active"><a href="http://localhost:3000/home/profil">Your Profil</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a id='deconnexion' href="#">Deconnexion</a></li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+
+
+
+
+
+
+
+
+	<div class="data_profil">
+		<h3>Your informations</h3>
+		<form action="/home/edit_profil" method="post" enctype="multipart/form-data">
+			<p>Login: <%= login %></p>
+			<% if (email) { %>
+			<p>Email: <%= email %>
+				<button class="modify_email" type="button">Modify</button>
+			</p>
+			<% } %>
+			<div class="choice_email" <%if(email){ %> style="display:none" <% } %> >
+				<p>Ton email:</p>
+				<input class="input_choice_email" name="email"/><br />
+			</div>
+
+			<% if (nom) { %>
+			<p>Nom: <%= nom %>
+				<button class="modify_nom" type="button">Modify</button>
+			</p>
+			<% } %>
+			<div class="choice_nom" <%if(nom){ %> style="display:none" <% } %> >
+				<p>Ton nom:</p>
+				<input class="input_choice_nom" name="nom"/><br />
+			</div>
+
+
+			<% if (prenom) { %>
+			<p>Prenom: <%= prenom %>
+				<button class="modify_prenom" type="button">Modify</button>
+			</p>
+			<% } %>
+			<div class="choice_prenom" <%if(prenom){ %> style="display:none" <% } %> >
+				<p>Ton prenom:</p>
+				<input class="input_choice_prenom" name="prenom"/><br />
+			</div>
+			<% if (sex) { %>
+				 <p>Sex: <%= sex %>
+					 <button class="modify_sex" type="button">Modify</button>
+				</p>
+			<% } %>
+				<div class="choice_sex" <%if(sex){ %> style="display:none" <% } %> >
+					<p>Choisir sex: </p>
+					<p>
+						Homme: <input class="input_choice_sex" type="radio" value="homme" name="sex" /><br />
+						Femme: <input class="input_choice_sex" type="radio" value="femme" name="sex" />
+					</p>
+				</div>
+			<%if (orientation) { %>
+				 <p>Orientation sexuelle: <%= orientation %>
+					 <button class="modify_orientation" type="button">Modify</button>
+				 </p>
+			<% } %>
+				<div class="choice_orientation" <%if(orientation){ %> style="display:none" <% } %> >
+					<p>Choisir orientation sexuelle: </p>
+					<p>
+						Hetero: <input class="input_choice_orientation" type="radio" value="hetero" name="orientation" /><br />
+						Bi: <input class="input_choice_orientation" type="radio" value="bi" name="orientation" /><br />
+						Hommo: <input class="input_choice_orientation" type="radio" value="hommo" name="orientation" />
+					</p>
+				</div>
+			<%if (bio) { %>
+				 <p>Biographie: <%= bio %>
+					 <button class="modify_bio" type="button">Modify</button>
+				 </p>
+			<% } %>
+				<div class="choice_bio" <%if(bio){ %> style="display:none" <% } %> >
+					<p>Ta biodescription:</p>
+					<input class="input_choice_bio" name="bio" /><br />
+				</div>
+        <br>
+			<%if (interets) { %>
+				 <p>Interets: <% for(var i=0; i < interets.length; i++) {%>
+            <button type="button" class="interets" class="btn btn-primary btn-lg active"><%= interets[i] %></button>
+           <% } %>
+					 <button class="modify_interets" type="button">Modify</button>
+				 </p>
+			<% } %>
+				<div class="choice_interets" <%if(interets){ %> style="display:none" <% } %> >
+					<p>Tes centres d'interets: </p>
+					<input class="input_choice_interets" type="text" name="interets" placeholder="surf, animaux, foot..."  /><br />
+				</div>
+
+
+        <%if (picture_profil) { %>
+          <p> Photo de profil:
+            <img src='http://localhost:3000/uploads/<%= picture_profil %>' />
+            <button class="modify_picture_profil" type="button">Modify</button>
+           </p>
+        <% } %>
+          <div class="choice_picture_profil" <%if(picture_profil){ %> style="display:none" <% } %> >
+            <p>Ajoute ta nouvelle photo de profil: </p>
+            <input class="input_choice_picture_profil" type="file" name="picture_profil"/><br />
+          </div>
+
+				<%if (photos) { %>
+					 <p>Photos: <% for(var i=0; i < photos.length; i++) {%>
+                        <% if (i < 4){ %>
+                          <div style="display:inline-block">
+                            <img class="photos_user" id="<%=photos[i]%>"src='http://localhost:3000/uploads/<%= photos[i] %>' />
+                          </div>
+                        <%}%>
+                    <% } %>
+						 <button class="modify_photos" type="button">Modify</button>
+					 </p>
+				<% } %>
+					<div class="choice_photos" <%if(photos){ %> style="display:none" <% } %> >
+						<p>Ajoute une nouvelle photo a ton album de 4 photos (s'il y'en a plus de 4 la premiere sera supprimee): </p>
+						<input class="input_choice_photos" type="file" name="file"/><br />
+					</div>
+
+      <!--  <input type="file" name="picture_profil"/><br /> -->
+
+			<button type="submit" name="button">Valider les modifications</button>
+		</form>
+	</div>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="http://localhost:3003/socket.io/socket.io.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+
+      var socket = io.connect('http://localhost:3003');
+
+
+      socket.emit('new user', <%-JSON.stringify(login)%>, function(data){
+         if (data) {
+         //  $('#nickWrap').hide();
+           $('#contentWrap').show();
+         }
+         else {
+           $('#nickError').html('That username is already taken ! try again.');
+         }
+      });
+
+
+      $(".interets").click(function() {
+        $.ajax({
+          type: 'POST',
+          dataType: 'json',
+          contentType: 'application/json; charset=utf-8',
+          data: JSON.stringify({
+            interets: $(this).text()
+          }),
+          url: '/kill_interets',
+        });
+        $('button').remove( ":contains(" + $(this).text() + ")" );
+      });
+
+      $(".photos_user").click(function() {
+        $.ajax({
+          type: 'POST',
+          dataType: 'json',
+          contentType: 'application/json; charset=utf-8',
+          data: JSON.stringify({
+            photo: this.id
+          }),
+          url: '/kill_photo',
+        });
+        console.log(this.id)
+        $(this).parent().remove();
+      });
+
+
+
+      $("#deconnexion").click(function() {
+        $.ajax({
+          type: 'POST',
+          dataType: 'json',
+          contentType: 'application/json; charset=utf-8',
+          url: '/deconnexion',
+        });
+        window.location.replace("http://localhost:3000");
+      });
+
+
+
+
+
+
+			$(".modify_email").click(function() {
+				$(".choice_email").toggle();
+				$(".input_choice_email").val("");
+			});
+
+			$(".modify_nom").click(function() {
+				$(".choice_nom").toggle();
+				$(".input_choice_nom").val("");
+			});
+
+			$(".modify_prenom").click(function() {
+				$(".choice_prenom").toggle();
+				$(".input_choice_prenom").val("");
+			});
+
+			$(".modify_sex").click(function() {
+				$(".choice_sex").toggle();
+				$(".input_choice_sex").prop("checked", false);
+			});
+
+			$(".modify_orientation").click(function() {
+				$(".choice_orientation").toggle();
+				$(".input_choice_orientation").prop("checked", false);
+			});
+
+			$(".modify_bio").click(function() {
+				$(".choice_bio").toggle();
+				$(".input_choice_bio").val("");
+			});
+
+			$(".modify_interets").click(function() {
+				$(".choice_interets").toggle();
+				$(".input_choice_interets").val("");
+			});
+
+			$(".modify_photos").click(function() {
+				$(".choice_photos").toggle();
+				$(".input_choice_photos").val("");
+			});
+
+      $(".modify_picture_profil").click(function() {
+				$(".choice_picture_profil").toggle();
+				$(".input_choice_picture_profil").val("");
+			});
+
+		});
+	</script>
+
+  </body>
+</html>

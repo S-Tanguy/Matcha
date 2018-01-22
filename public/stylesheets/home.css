@@ -1,0 +1,140 @@
+.suggestions {
+	border: 1px solid black;
+	width: 80%;
+	height: 500px;
+	margin-top: 60px;
+	display: inline-block;
+	overflow: auto;
+	float: left
+}
+
+.user_suggestion {
+	border: 1px solid black;
+	display: inline-block;
+	margin-left: 5px;
+	margin-top: 5px;
+}
+
+.notifications {
+	margin-top: 60px;
+	display: inline-block;
+border: 1px solid black;
+width: 20%;
+height: 500px;
+float: left;
+overflow: auto;
+}
+
+.notificationss {
+	display: inline-block;
+border: 1px solid black;
+width: 20%;
+height: 500px;
+overflow: auto;
+}
+
+.main {
+	border: 1px solid black;
+}
+
+.filtres {
+	display: inline-block;
+	float: left;
+}
+
+.my_info {
+	display: inline-block;
+	float: left;
+	margin-left: 3vmin;
+}
+
+.profil_picture {
+	margin-left: 5vmin;
+	display: inline-block;
+	float: left;
+}
+
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; }
+      #mess { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+      #mess input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+      #mess button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+
+.error {
+	color: red;
+}
+
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+.whisper {
+	color: gray;
+	font-style: italic;
+}
+
+.amis {
+	color: red;
+	display: inline-block;
+	border: 1px solid black;
+	padding: 3px;
+}
+
+.friends {
+	font-style: italic;
+}
+
+.chat_wid {
+	width:200px;
+	height:400px;
+	float:right;
+	border:1px solid black;
+}
+
+.header_wid {
+	height: 50px;
+	border: 1px solid black;
+}
+
+.viewer_of_my_profil {
+	border: 1px solid black;
+	margin-top: 5px;
+	display: inline-block;
+	padding: 3px;
+}
+
+
+#user_input_autocomplete_address {
+	width: 400px;
+}
+
+.modal {
+    display:    none;
+    position:   fixed;
+    z-index:    1000;
+    top:        0;
+    left:       0;
+    height:     100%;
+    width:      100%;
+    background: rgba( 255, 255, 255, .8 )
+                url('http://i.stack.imgur.com/FhHRx.gif')
+                50% 50%
+                no-repeat;
+}
+
+/* When the body has the loading class, we turn
+   the scrollbar off with overflow:hidden */
+body.loading {
+    overflow: hidden;
+}
+
+/* Anytime the body has the loading class, our
+   modal element will be visible */
+body.loading .modal {
+    display: block;
+}
