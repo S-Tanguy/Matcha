@@ -109,8 +109,6 @@ io.on('connection', function(socket){
       html = `<br><div class=notifSomeOneSendMessage> <p> ${socket.nickname} send you a new message </p> </div><br><hr>`
       await db.collection('users').updateOne({login: data.desti}, {$push: {notifications: html}})
 		});
-			console.log(conv[0] + ' bite');
-			console.log(conv[1] + ' bite');
       if (users[data.desti]){
 		      users[data.desti].emit('whisper', {msg: data.msg, nick: socket.nickname, div_chat: data.desti});
           users[data.desti].emit('notifNewMessage', socket.nickname);

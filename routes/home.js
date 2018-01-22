@@ -11,22 +11,13 @@ var url = 'mongodb://localhost:27017/db_matcha';
 var options = {
   provider: 'google',
 
-  // Optional depending on the providers
-  httpAdapter: 'https', // Default
-  apiKey: 'AIzaSyCYV5V1wefNwQQ_5ukp4SLtcqmrUh2Kp48', // for Mapquest, OpenCage, Google Premier
-  formatter: null         // 'gpx', 'string', ...
+  httpAdapter: 'https',
+  apiKey: 'AIzaSyCYV5V1wefNwQQ_5ukp4SLtcqmrUh2Kp48',
+  formatter: null
 };
 
 var geocoder = NodeGeocoder(options);
 
-/*const getLongiLati = function(req, longi, lati) {
-  return new Promise(function(res, rej) {
-    if (longi == 'nothing' && lati == 'nothing')
-      return ({longitude: req.session.longitude, latitude: req.session.latitude});
-    else
-      return ({longitude: longi, latitude: lati});
-  })
-}*/
 
 getUsers = async (req, longi, lati) => {
 	if (longi == 'nothing' && lati == 'nothing'){
@@ -165,7 +156,7 @@ router.get('/', async function(req, res, next) {
     var friends = await getFriends(req.session.user);
     var notifications = await getNotifications(req.session.user);
     var info = await getMyinfo(req.session.user);
-		res.render('home', { title: req.session.user, users: users, viewers: viewers, info: info, friends: friends, notifications: notifications, toto: "bite"});
+		res.render('home', { title: req.session.user, users: users, viewers: viewers, info: info, friends: friends, notifications: notifications, toto: " "});
 	}
 });
 
@@ -186,25 +177,6 @@ getPointsCommuns = async (arr1, arr2) => {
 	}
 	return(nb);
 }
-
-
-/*tri = async (tab) => {
-	let array = [];
-	let taille = tab.length;
-
-	for (var i = 0; i < taille - 1; i++)
-	{
-		let toto = 0;
-		if (tab[i].nb < tab[i + 1].nb)
-		{
-			var b = tab[i];
-			tab[i] = tab[i + 1];
-			tab[i + 1] = b;
-		}
-	}
-	return(tab);
-}*/
-
 
 giveTab = async (req, users, array, array_of_interets, tab) => {
 	users.forEach(async function(doc, err){
@@ -274,7 +246,6 @@ const getInterest = function(login) {
 
 
 router.post('/filtres', async function(req, res, next) {
-	//let db = await mongo.connect(url);
 	let array = [];
 	let points_en_communs = 0;
 	let count = 0;
@@ -306,7 +277,6 @@ router.post('/filtres', async function(req, res, next) {
 		  array_of_interets = await splitInterets(req.body.interets);
     else
       array_of_interets = await getInterest(req.session.user);
-		//array_users = await getUsers(req, 'nothing', 'nothing');
 		result = await giveTab(req, array_users, array, array_of_interets, tab)
 
 		tab = result.tab;
@@ -372,7 +342,6 @@ var storage = multer.diskStorage({
 
 var upload = multer({ storage: storage }).fields([{ name: 'file', maxCount: 1 }, { name: 'picture_profil', maxCount: 1 }])
 
-// var upload_picture = multer({ storage: storage }).single('picture_profil');
 
 splitInterets = async (str) => {
 	return str.replace(/\s\s+/g, ' ').split(" ");
@@ -434,9 +403,6 @@ router.post('/edit_profil', upload, function(req, res, next) {
 	 			      { $addToSet: { interets: {$each: array }}
 				  });
 				}
-				//if (req.body.file != "" && req.body.file != null)
-				//{
-			   // Everything went fine
           if (req.files.file) {
             var photos = await db.collection('users').find({login: req.session.user}, {photos: 1}).toArray();
             if (photos[0].photos.length >= 4)
@@ -463,8 +429,6 @@ router.post('/edit_profil', upload, function(req, res, next) {
                 { $set: { picture_profil: req.files.picture_profil[0].filename }
             });
           }
-
-			//	}
 			});
 	}
 	res.redirect('/home/profil');
@@ -473,7 +437,6 @@ router.post('/edit_profil', upload, function(req, res, next) {
 
 router.post('/deconnexion', function(req, res, next) {
 	if (req.session) {
-	    // delete session object
 	    req.session.destroy(function(err) {
 		  if (err) {
 		  } else {

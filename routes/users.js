@@ -134,7 +134,6 @@ router.post('/signal_button', function(req, res, next) {
 });
 
 router.post('/blok', function(req, res, next){
-  console.log('bite');
   mongo.connect(url, async function(err, db){
     await db.collection('users').findOne({login: req.body.user, bloker_users_history: [req.session.user]}, async function (error, result){
         await db.collection('users').update({
@@ -177,7 +176,6 @@ router.post('/blok', function(req, res, next){
 });
 
 router.post('/unblok', function(req, res, next){
-  console.log('bite');
   mongo.connect(url, async function(err, db){
     await db.collection('users').update({
       login: req.session.user

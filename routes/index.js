@@ -126,7 +126,7 @@ router.post('/reset_password', function(req, res, next){
 			bcrypt.hash(req.body.password_one, 5, async function(err, bcryptedPassword) {
 				db.collection('users').updateOne({email: req.body.email_hidden}, { $set: { password: bcryptedPassword } }, async function(err, result){
 					if (result){
-						console.log('OK BITE')
+						console.log('OK')
 					}
 					await db.collection('users').updateOne({email: req.body.email_hidden}, { $unset: { cle: '' } });
 				});
