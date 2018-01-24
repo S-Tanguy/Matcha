@@ -95,12 +95,12 @@ router.post('/forget_password', function(req, res, next){
 			let transporter = nodemailer.createTransport({
     		service: 'gmail',
     		auth: {
-					user: 'matcha42424242@gmail.com',
-					pass: 'matcha42'
+					user: 'youremailadress',
+					pass: 'yourpassword'
 				}
 			});
 			let mailOptions = {
-        from: 'matcha42424242@gmail.com', // sender address
+        from: 'youremailadress', // sender address
         to: req.body.email, // list of receivers
         subject: 'Change password ✔', // Subject line
         text: 'Please check this page for reset your password ! http://localhost:3000/reset_password?cle=' + cle + '&email=' +  req.body.email + '',
